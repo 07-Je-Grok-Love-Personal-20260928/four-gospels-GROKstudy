@@ -97,7 +97,7 @@ def page(fn, title, sub, body, hero_cls="", extra_head=""):
     prv = NAV[idx-1] if idx > 0 else None; nxt = NAV[idx+1] if idx < len(NAV)-1 else None
     pn = '<nav class="pn">' + (f'<a href="{prv[0]}">← {prv[1]} {prv[2]}</a>' if prv else '<span></span>') + (f'<a href="{nxt[0]}">{nxt[1]} {nxt[2]} →</a>' if nxt else '<span></span>') + '</nav>'
     return f'''<!doctype html><html lang="zh-CN" data-theme="night"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>{esc(title)} · 四福音书深读 GROKstudy</title><meta name="description" content="{esc(sub)}">
+<title>{esc(title) + " · " if title != "四福音书深读" else ""}四福音书深读 GROKstudy · 2026-10-31 v1.0.0</title><meta name="description" content="{esc(sub)}">
 <script>try{{var t=localStorage.getItem('fg-theme');if(t)document.documentElement.dataset.theme=t;if(localStorage.getItem('fg-toc')==='0')document.documentElement.classList.add('toc-off')}}catch(e){{}}</script>
 <link rel="stylesheet" href="assets/style.css?v={ASSET_V}">{extra_head}</head><body>
 <div class="bg" aria-hidden="true"><i></i><i></i><i></i></div><div id="prog"></div>
