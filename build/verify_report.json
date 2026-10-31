@@ -1,0 +1,14 @@
+{
+ "sermon_blocks": 6,
+ "sermon_ok": 6,
+ "cci_blocks": 59,
+ "cci_paras": 93,
+ "cci_live_ok": 93,
+ "cci_local_ok": 93,
+ "creed_ok": 3,
+ "ws_paras": 7,
+ "ws_ok": 7,
+ "fail": [],
+ "prose_quotes": 290,
+ "prose_unmatched": []
+}
