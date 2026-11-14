@@ -30,21 +30,25 @@ def lh(f, mode):
     subprocess.run(cmd,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=240)
     j=json.load(open(o)); a=j["audits"]
     return {"score":round(j["categories"]["performance"]["score"]*100),"LCP_ms":round(a["largest-contentful-paint"]["numericValue"]),"TBT_ms":round(a["total-blocking-time"]["numericValue"]),"CLS":round(a["cumulative-layout-shift"]["numericValue"],3),"FCP_ms":round(a["first-contentful-paint"]["numericValue"])}
+SRV=[None]
+def ensure_srv():
+    if SRV[0] is None or SRV[0].poll() is not None:
+        SRV[0]=subprocess.Popen([sys.executable,"-m","http.server",str(PORT),"-d",D,"--bind","127.0.0.1"],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True); time.sleep(1)
 async def main():
-    srv=subprocess.Popen([sys.executable,"-m","http.server",str(PORT),"-d",D,"--bind","127.0.0.1"],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL); time.sleep(1)
+    ensure_srv()
     res={}
     try:
         async with async_playwright() as p:
             br=await p.chromium.launch(args=["--enable-gpu-rasterization"])
             for f in PAGES:
-                res[f]={"scroll_mobile":await scroll_test(br,f,True),"scroll_desktop":await scroll_test(br,f,False)}
+                ensure_srv(); res[f]={"scroll_mobile":await scroll_test(br,f,True),"scroll_desktop":await scroll_test(br,f,False)}
             await br.close()
         if os.environ.get("LH","1")=="1":
             for f in PAGES:
                 for m in ("mobile","desktop"):
-                    try: res[f]["lh_"+m]=lh(f,m)
+                    try: ensure_srv(); res[f]["lh_"+m]=lh(f,m)
                     except Exception as e: res[f]["lh_"+m]=str(e)[:80]
-    finally: srv.kill()
+    finally: SRV[0].kill()
     json.dump(res,open(os.path.join(OUT,f"perf_{LABEL}.json"),"w"),ensure_ascii=False,indent=1)
     for f,v in res.items(): print(f, json.dumps(v,ensure_ascii=False))
 asyncio.run(main())

@@ -1,0 +1,182 @@
+{
+ "index": {
+  "scroll_mobile": {
+   "frames": 514,
+   "fps": 59.5,
+   "p95_ms": 16.7,
+   "jank_gt50": 1,
+   "longtasks": 0,
+   "lt_total_ms": 0,
+   "scrolled": 4200,
+   "height": 5162
+  },
+  "scroll_desktop": {
+   "frames": 510,
+   "fps": 59.9,
+   "p95_ms": 16.7,
+   "jank_gt50": 0,
+   "longtasks": 0,
+   "lt_total_ms": 0,
+   "scrolled": 3507,
+   "height": 3483
+  },
+  "lh_mobile": {
+   "score": 100,
+   "LCP_ms": 1503,
+   "TBT_ms": 2,
+   "CLS": 0,
+   "FCP_ms": 1154
+  },
+  "lh_desktop": {
+   "score": 100,
+   "LCP_ms": 422,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 422
+  }
+ },
+ "matthew": {
+  "scroll_mobile": {
+   "frames": 510,
+   "fps": 58.6,
+   "p95_ms": 16.7,
+   "jank_gt50": 1,
+   "longtasks": 2,
+   "lt_total_ms": 204,
+   "scrolled": 4200,
+   "height": 12666
+  },
+  "scroll_desktop": {
+   "frames": 496,
+   "fps": 58.1,
+   "p95_ms": 16.8,
+   "jank_gt50": 1,
+   "longtasks": 0,
+   "lt_total_ms": 0,
+   "scrolled": 8854,
+   "height": 9312
+  },
+  "lh_mobile": {
+   "score": 98,
+   "LCP_ms": 1980,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 1980
+  },
+  "lh_desktop": {
+   "score": 100,
+   "LCP_ms": 394,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 379
+  }
+ },
+ "maps": {
+  "scroll_mobile": {
+   "frames": 490,
+   "fps": 56.1,
+   "p95_ms": 16.8,
+   "jank_gt50": 2,
+   "longtasks": 2,
+   "lt_total_ms": 184,
+   "scrolled": 4060,
+   "height": 10470
+  },
+  "scroll_desktop": {
+   "frames": 493,
+   "fps": 57.8,
+   "p95_ms": 16.8,
+   "jank_gt50": 0,
+   "longtasks": 0,
+   "lt_total_ms": 0,
+   "scrolled": 9756,
+   "height": 9504
+  },
+  "lh_mobile": {
+   "score": 98,
+   "LCP_ms": 1946,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 1946
+  },
+  "lh_desktop": {
+   "score": 100,
+   "LCP_ms": 430,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 384
+  }
+ },
+ "synoptic": {
+  "scroll_mobile": {
+   "frames": 511,
+   "fps": 59.4,
+   "p95_ms": 16.8,
+   "jank_gt50": 0,
+   "longtasks": 0,
+   "lt_total_ms": 0,
+   "scrolled": 4480,
+   "height": 5411
+  },
+  "scroll_desktop": {
+   "frames": 497,
+   "fps": 58.2,
+   "p95_ms": 16.8,
+   "jank_gt50": 0,
+   "longtasks": 0,
+   "lt_total_ms": 0,
+   "scrolled": 4987,
+   "height": 5019
+  },
+  "lh_mobile": {
+   "score": 99,
+   "LCP_ms": 1784,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 1784
+  },
+  "lh_desktop": {
+   "score": 100,
+   "LCP_ms": 437,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 437
+  }
+ },
+ "creeds": {
+  "scroll_mobile": {
+   "frames": 517,
+   "fps": 59.9,
+   "p95_ms": 16.8,
+   "jank_gt50": 0,
+   "longtasks": 0,
+   "lt_total_ms": 0,
+   "scrolled": 4480,
+   "height": 9414
+  },
+  "scroll_desktop": {
+   "frames": 501,
+   "fps": 58.6,
+   "p95_ms": 16.8,
+   "jank_gt50": 0,
+   "longtasks": 0,
+   "lt_total_ms": 0,
+   "scrolled": 6846,
+   "height": 6366
+  },
+  "lh_mobile": {
+   "score": 100,
+   "LCP_ms": 1490,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 1490
+  },
+  "lh_desktop": {
+   "score": 100,
+   "LCP_ms": 427,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 427
+  }
+ }
+}
