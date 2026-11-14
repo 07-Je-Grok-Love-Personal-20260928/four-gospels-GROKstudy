@@ -108,7 +108,7 @@ def city(k, cls="", label=True, fs=15, r=5.5, info=""):
 
 def bigmap(eps, assets="assets"):
     """主地图：四次旅程 + 书信写作地→收信地。"""
-    s=[f'<svg class="gmap" viewBox="0 0 {W} {H}" role="img" aria-label="保罗行程与新约书信地图"><image href="{assets}/geo/med.svg" width="{W}" height="{H}"/>']
+    s=[f'<svg class="gmap" viewBox="0 0 {W} {H}" role="img" aria-label="保罗行程与新约书信地图"><use href="#sym-med" width="{W}" height="{H}"/>']
     s.append('<g class="regions">'+"".join(f'<text x="{P(lo,la)[0]:.0f}" y="{P(lo,la)[1]:.0f}" text-anchor="middle">{n}</text>' for n,lo,la in REGIONS)+'</g>')
     for jid,name,col,ks in JOURNEYS:
         pts=[P(*ll(k)) for k in ks]
@@ -139,7 +139,7 @@ def minimap(e, assets="assets"):
     else:
         nh=w/1.6; y0=max(0,min(H-nh,y0-(nh-h)/2)); h=min(H,nh)
     sc=w/600; fs=max(13,15*sc)
-    s=f'<svg class="mmap" viewBox="{x0:.0f} {y0:.0f} {w:.0f} {h:.0f}" role="img" aria-label="{e["n"]}写作地与收信地"><image href="{assets}/geo/med.svg" width="{W}" height="{H}"/>'
+    s=f'<svg class="mmap" viewBox="{x0:.0f} {y0:.0f} {w:.0f} {h:.0f}" role="img" aria-label="{e["n"]}写作地与收信地"><use href="#sym-med" width="{W}" height="{H}"/>'
     if e["fr"]!=e["dest"]:
         dx,dy=x2-x1,y2-y1; L=math.hypot(dx,dy) or 1
         cx,cy=(x1+x2)/2-dy*0.18,(y1+y2)/2+dx*0.18

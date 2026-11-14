@@ -4,16 +4,18 @@ sys.path.insert(0, os.path.dirname(__file__))
 from common import page, QUOTES, VER, DATE, md
 from gsp1 import MAT, MRK; from gsp2 import LUK, JHN
 from gpage import gospel
-import geo, palgeo, p_whole, p_hist, p_syn, p_doc, p_creed, p_mem, p_misc
+import geo, palgeo, p_whole, p_hist, p_syn, p_doc, p_creed, p_mem, p_misc, p_maps, maps
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); D = os.path.join(ROOT, "docs")
 os.makedirs(os.path.join(D, "assets", "geo"), exist_ok=True)
 geo.base_svg(os.path.join(D, "assets", "geo", "med.svg")); palgeo.base_svg(os.path.join(D, "assets", "geo", "pal.svg"))
 EPS = [MAT, MRK, LUK, JHN]
 def W(fn, html):
+    html = html.replace('<body>', '<body>' + maps.symbols(html, D), 1)
     open(os.path.join(D, fn), "w", encoding="utf-8").write(html); print("wrote", fn, len(html)//1024, "KB")
 W("index.html", page("index.html", "四福音书深读", "马太 · 马可 · 路加 · 约翰 · 整本圣经与圣约 · 时间故事地图 · 欧陆改革宗 · 三项联合信条与三大信经逐字对照", p_misc.index(EPS), "home"))
 W("bible.html", page("bible.html", "整本圣经与圣约", "先看全景：福音书在创造—堕落—救赎—成全的救赎历史与恩典之约中的位置", p_whole.build()))
 W("history.html", page("history.html", "时间 · 故事 · 地图", "主前 63–主后 95：第二圣殿时期、耶稣生平十幕、巴勒斯坦地图、耶路撒冷受难周、文化与群体", p_hist.build()))
+W("maps.html", page("maps.html", "地图 · 历史 · 文化", "罗马世界、加利利海、地形剖面、希律圣殿：每张图都有离线讲解图 + 多源实时地图", p_maps.build()))
 SUB = {"mat":"君王弥赛亚与天国：应验旧约的大卫子孙、五篇讲论、大使命","mrk":"受苦的仆人：立刻行动的神的儿子，十字架是认信的高峰",
        "luk":"万人的救主：按次序考察的历史、寻找失丧的人、圣灵与祷告","jhn":"道成肉身的神子：七神迹、七个“我是”、信而得生命"}
 for e in EPS: W(e["fn"], page(e["fn"], f'{e["ic"]} {e["n"]}', SUB[e["id"]], gospel(e)))

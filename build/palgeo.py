@@ -79,11 +79,11 @@ def base_svg(path):
            f'<path d="{d(lakes)}" fill="#1a5a8a" stroke="#7fb3ff" stroke-opacity=".7" stroke-width="1"/>'
            f'<path d="{d(rv, False)}" fill="none" stroke="#6fb6ff" stroke-opacity=".9" stroke-width="2" stroke-linejoin="round"/></svg>')
     open(path, "w").write(svg); return len(svg)
-def city(k, fs=15, r=5.5):
+def city(k, fs=17, r=6):
     n, lon, lat, dx, dy, an, info = C[k]; x, y = P(lon, lat)
-    return f'<g class="city" data-k="{k}" data-n="{n}" data-i="{info}" tabindex="0"><circle cx="{x:.1f}" cy="{y:.1f}" r="{r}"/><text x="{x+dx:.0f}" y="{y+dy:.0f}" text-anchor="{an}" font-size="{fs}">{n}</text></g>'
+    return f'<g class="hot city" data-k="{k}" data-n="{n}" data-i="{info}" tabindex="0" role="button"><circle cx="{x:.1f}" cy="{y:.1f}" r="{r}"/><text x="{x+dx:.0f}" y="{y+dy:.0f}" text-anchor="{an}" font-size="{fs}">{n}</text></g>'
 def palmap(assets="assets"):
-    s = [f'<svg class="gmap pal" viewBox="0 0 {W} {H}" role="img" aria-label="耶稣生平路线地图（巴勒斯坦）"><image href="{assets}/geo/pal.svg" width="{W}" height="{H}"/>']
+    s = [f'<svg class="gmap pal" viewBox="0 0 {W} {H}" role="img" aria-label="耶稣生平路线地图（巴勒斯坦）"><use href="#sym-pal" width="{W}" height="{H}"/>']
     s.append('<g class="regions">'+"".join(f'<text x="{P(lo,la)[0]:.0f}" y="{P(lo,la)[1]:.0f}" text-anchor="middle">{n}</text>' for n, lo, la in REG)+'</g>')
     for jid, name, col, ks in ROUTES:
         s.append(f'<g class="lyr {jid}" data-l="{jid}"><path d="{smooth([P(*ll(k)) for k in ks])}" stroke="{col}" class="route"><title>{name}</title></path></g>')
@@ -103,7 +103,7 @@ def jerusalem():
          '<rect x="240" y="150" width="140" height="90" rx="8" fill="rgba(245,185,66,.18)" stroke="#f5b942"/>',
          '<path class="pw" d="M150,390 C330,360 470,250 520,170 C420,150 260,250 170,330 C140,300 120,260 120,240 C200,200 280,140 330,120 C250,160 160,230 120,240 C110,200 110,170 110,140"/>']
     for i, (n, x, y, c, d) in enumerate(pts):
-        s.append(f'<g class="jp" tabindex="0" data-n="{n}" data-i="{d}"><circle cx="{x}" cy="{y}" r="9" fill="{c}"/><text x="{x+13}" y="{y+5}">{n}</text></g>')
+        s.append(f'<g class="hot jp" tabindex="0" role="button" data-n="{n}" data-i="{d}"><circle cx="{x}" cy="{y}" r="9" fill="{c}"/><text x="{x+13}" y="{y+5}">{n}</text></g>')
     s.append('<text x="680" y="455" text-anchor="end" class="lbl sm">示意图，非比例 · 虚线：受难夜的大致行程</text></svg>')
     return "".join(s)
 if __name__ == "__main__": print(base_svg("/tmp/pal.svg"), W, H)

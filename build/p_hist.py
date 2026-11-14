@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from common import md, esc
-from palgeo import palmap, jerusalem, ROUTES
+from palgeo import ROUTES
+import maps
 def tbl(head, rows):
     return '<div class="tbl"><table><thead><tr>'+"".join(f'<th>{h}</th>' for h in head)+'</tr></thead><tbody>'+"".join('<tr>'+"".join(f'<td>{md(c)}</td>' for c in r)+'</tr>' for r in rows)+'</tbody></table></div>'
 TL=[("前63","w","罗马将军庞培攻占耶路撒冷，犹太成为罗马附庸",""),("前37","w","大希律在罗马支持下作犹太王","前 37–前 4"),("前20","w","大希律开始重建圣殿（约2:20“四十六年”）",""),
@@ -58,10 +59,9 @@ def build():
     b.append('<h2 id="h1">一、时间线（主前 63–主后 95）</h2><p class="note">年代为改革宗与保守福音派学者常用的近似值。耶稣降生约在主前 6–5 年（大希律死于主前 4 年之前）；受难在主后 30 年或 33 年两说之间，本站并列。</p>'+timeline())
     b.append('<h3 id="h1b">📅 为什么是“主前”出生？</h3><div class="card glass"><p>'+md("六世纪修士狄奥尼修斯计算“主后元年”时算错了几年；而马太记载大希律在耶稣降生后仍在世（{{太2:1}}），大希律死于主前 4 年，所以耶稣约生于主前 6–5 年。路加说耶稣开始传道时“年纪约有三十岁”（{{路3:23}}），与提庇留十五年（约主后 28–29）大致吻合。")+'</p></div>')
     b.append('<h2 id="h2">二、故事线：耶稣生平十幕</h2>'+story())
-    lg="".join(f'<button class="lb on" data-l="{j}" style="--c:{c}">{n}</button>' for j,n,c,_ in ROUTES)
-    b.append(f'<h2 id="h3">三、地图：耶稣的足迹</h2><div class="mapbox glass"><div class="maptools">{lg}<button class="lb play" id="playroutes">▶ 播放路线</button></div><div class="palwrap"><div class="mapscroll" id="bigmap">{palmap()}</div><div class="palside"><div id="cityinfo" class="cityinfo" aria-live="polite">点按地图上的地点，查看相关经文与事件。</div><ol class="steps">'+"".join(f'<li style="--c:{c}"><b>{n}</b></li>' for _,n,c,_ in ROUTES)+'</ol></div></div><p class="note">底图：Natural Earth 10m（公有领域）海岸线、湖泊与约但河，构建时投影为本站静态 SVG；山地阴影为示意。路线按福音书记载的地点连成的示意线，不代表精确道路；部分地点（如以马忤斯、格拉森）的位置学界有不同说法。</p></div>')
-    b.append('<h3 id="h3b">🏙️ 耶路撒冷：受难周示意图</h3><div class="mapbox glass jbox">'+jerusalem()+'<div id="jinfo" class="cityinfo" aria-live="polite">点按地点查看受难周事件。</div></div>')
-    b.append('<h2 id="h4">四、政治版图：希律家族与罗马巡抚</h2>'+tbl(["统治者","年代","辖区","在福音书中"],HER))
+    b.append('<h2 id="h3">三、地图：耶稣的足迹</h2><p class="note">'+md("每张地图都有两层：左边是**离线讲解图**（内联 SVG，断网也能看），右边是**实时地图**（本地打包的 Leaflet，可在 11 种全球底图之间切换；某个底图连不上时会@@自动切换到下一个@@）。更多地图见「[地图·历史·文化](maps.html)」页。").replace("[地图·历史·文化](maps.html)",'<a href="maps.html">地图·历史·文化</a>')+'</p>'+maps.palestine())
+    b.append('<h3 id="h3b">🏙️ 耶路撒冷：受难周地图</h3>'+maps.jerusalem())
+    b.append('<h2 id="h4">四、政治版图：希律家族与罗马巡抚</h2>'+maps.herod()+tbl(["统治者","年代","辖区","在福音书中"],HER))
     b.append('<h2 id="h5">五、地区与文化特征</h2>'+tbl(["地区","主要地点","福音书中的意义","社会宗教特征"],REG))
     b.append('<h2 id="h6">六、第二圣殿时期的群体</h2>'+tbl(["群体","特点","与耶稣的冲突/互动","人物"],PARTY))
     b.append('<h2 id="h7">七、第一世纪巴勒斯坦的十个关键词</h2><div class="kws">'+"".join(f'<div class="kwc glass reveal"><span>{a}</span><b>{c}</b><p>{md(d)}</p></div>' for a,c,d in KW)+'</div>')

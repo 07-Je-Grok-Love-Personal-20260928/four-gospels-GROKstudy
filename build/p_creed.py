@@ -17,7 +17,7 @@ def recite(k, title, ic, cls):
     body="".join(f'<p class="rl"><span class="rn">{i+1}</span><span class="rt">{esc(x)}</span></p>' for i,x in enumerate(L))
     c=CREEDS[k]
     return (f'<article class="recite {cls} glass" id="r-{k}" data-creed="{k}"><header><span class="ric">{ic}</span><h3 id="c-{k}">{title}</h3><a href="{c["url"]}" target="_blank" rel="noopener">CCI 原文 ↗</a></header>'
-            f'<div class="rmodes" role="group" aria-label="背诵模式"><button class="on" data-m="read">📖 阅读</button><button data-m="hint">🔤 首字提示</button><button data-m="hide">🙈 遮盖（点按显示）</button><button data-m="big">🔠 大字</button></div>'
+            f'<div class="rmodes" role="group" aria-label="背诵模式"><button class="on" data-m="read">📖 阅读</button><button data-m="hint">🔤 首字提示</button><button data-m="hide">🙈 遮盖（点按显示）</button><button data-m="big">🔠 大字</button><button data-m="tts" class="tts">🔊 朗读</button></div>'
             f'<div class="rbody">{body}</div><details class="intro"><summary>CCI 导言（逐字）</summary><p>{esc(c["intro_text"][0])}</p></details></article>')
 def build():
     b=[]

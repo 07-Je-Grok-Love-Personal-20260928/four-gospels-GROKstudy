@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from common import md, esc, cq, wq, sq, verse_card, vtext
 from geo import minimap
+from ess import ESS
+import maps
 def flow(steps, end):
     s='<div class="flow">'
     for i,t in enumerate(steps): s+=f'<div class="fstep"><span class="n">{i+1}</span>{md(t)}</div><i class="farr">➜</i>'
@@ -37,6 +39,14 @@ SPECIAL = {
    + tbl(["#","“我是……”","经文","旧约背景"],[["1","生命的粮","{{约6:35}}","旷野的吗哪（出16）"],["2","世界的光","{{约8:12}}","住棚节的灯；云柱火柱"],["3","羊的门","{{约10:9}}","羊圈与救恩的入口"],["4","好牧人","{{约10:11}}","结34；诗23"],["5","复活与生命","{{约11:25}}","但12:2；结37"],["6","道路、真理、生命","{{约14:6}}","到父那里去的唯一道路"],["7","真葡萄树","{{约15:1}}","以色列是葡萄树（诗80；赛5）"]])
    + '<p class="note">'+md("另有不带比喻的“我是”：{{约8:58}}“还没有亚伯拉罕就有了我”，呼应出3:14 神的名，犹太人因此拿石头要打祂。")+'</p>'),
 }
+def essence(e):
+    x=ESS[e["id"]]
+    pil="".join(f'<div class="pil" style="--i:{k}"><span class="pi">{a}</span><b>{esc(t)}</b><p>{md(d)}</p></div>' for k,(a,t,d) in enumerate(x["ess"]))
+    ln='<div class="otnt">'+"".join(f'<div class="on{k}"><small>{lab}</small><p>{md(t)}</p></div>'+('<i>➜</i>' if k<2 else '') for k,(lab,t) in enumerate(zip(["📜 旧约的应许","✝️ 在基督里应验","⛪ 在教会中延续"],x["line"])))+'</div>'
+    tr="".join(f'<div class="trap"><p class="tw">❌ {md(a)}</p><p class="tr2">✅ {md(b)}</p></div>' for a,b in x["trap"])
+    return (f'<div class="ess"><p class="one">💎 {md(x["one"])}</p><div class="pils">{pil}</div>{ln}'
+            f'<div class="callout c-warn"><b>🚫 常见误区 vs ✅ 改革宗正解</b>{tr}</div>'
+            f'<div class="callout c-mem"><b>🧠 记忆链</b><p class="chain">{md(x["chain"])}</p></div></div>')
 def gospel(e):
     i=e["id"]
     facts=[("✍️","作者",e["au"]),("📅","写作时间",e["date"]),("📍","写作地点",e["place"]),("👥","原初读者",e["to"]),("🎨","耶稣的画像",e["port"]),("🐾","传统象征",e["sym"]),("🔗","总纲经文",e["acts"]),("📏","篇幅",f'{e["ch"]} 章 · 印记：{e["stamp"]}')]
@@ -52,7 +62,9 @@ def gospel(e):
     loc = "写作地与原初读者所在地" if e["fr"]!=e["dest"] else "写作地（传统说法）"
     return f'''<section class="ep" id="{i}" style="--gc:{e["col"]}">
 <div class="ep-banner glass reveal"><div class="kwbox"><span class="kwl">钥字</span><span class="kw">{e["kw"]}</span></div><p class="core">💎 {md(e["core"])}</p>{verse_card(e["kv"])}</div>
+<h2 id="{i}-ess">💎 本质核心：一句话 · 三支柱 · 一条线</h2>{essence(e)}
 <h2 id="{i}-f">🪪 基本资料</h2><div class="facts-wrap"><div class="facts">{fx}</div><figure class="mm glass">{minimap(e)}<figcaption>{loc}（真实底图：Natural Earth；按经纬度定位）</figcaption></figure></div>
+<h2 id="{i}-geo">🗺️ 地理足迹：讲解图 + 实时地图</h2>{maps.gospel_geo(e)}
 <h2 id="{i}-bg">🏺 背景与真实情境</h2><div class="two"><div class="card glass"><h4>历史背景</h4><p>{md(e["bg"])}</p></div><div class="card glass culture"><h4>🌍 文化区域特征</h4><p>{md(e["cul"])}</p></div></div>
 <h2 id="{i}-why">❓ 为什么写（前因后果）</h2>{flow(e["why"], "于是写下《"+e["n"]+"》")}
 <h2 id="{i}-what">📐 写了什么（结构）</h2>{sbar(e["ol"])}<ol class="outline">{ol}</ol>{mindtree(e)}<div class="angs">{angs}</div>
