@@ -48,8 +48,12 @@
   - 内容：每页顶部「⚡ 30 秒抓核心」；四卷「地理节奏条」（一章一格）；地图页新增「步行距离图」「节期轮（七个节期在基督里的应验）」；历史页新增「权力金字塔」；教义页十大主题归为四组；精简个别措辞，修正篇幅与钥字的前后一致。
   - 地图：17 个实测可用底图 + 并行测速自动选源 + 健康指示；剔除需密钥 / 占位图来源。
   - 性能：屏幕外与滚动进行中暂停需要重绘的装饰动画；进度条改为 CSS scroll-timeline；脚本执行时不再强制同步布局（改用 ResizeObserver）；触屏设备顶栏不做逐帧模糊；地图模块 content-visibility；目录跳转二次校正落点。
+  - 结构：首页（四卷 / 怎样学 / 标记）、对观页（理论 · 篇幅图 · 逐日 · 十架七言 · 显现 · 证据）、记忆页（骨架 / 主动回忆 / 长期记忆）补齐二级目录。
+  - 跳转：目录、页内锚点（地图总览卡片）与带 `#` 打开的链接改为「立即定位 + 逐帧校正」，屏幕外区块高度变化后仍精确落在标题处。
+  - 地图性能：实时地图初始化拆成多个短任务、滚动进行中不初始化（停下后空闲执行）、页面空闲 4 秒后预载 Leaflet。
   - 视觉：一级标题编号徽章与多色渐变、二级标题色条、更丰富的配色。
-  - 核对与质检：见下方「核对」与 Release 说明。
+  - 性能实测（Playwright，390px 手机 + 4× CPU 降速，5 个代表页各滚动 8 秒）：滚动期间长任务 v2.0.0 共 4 个 / 388 ms → v2.1.0 共 1 个 / 67 ms；>50 ms 掉帧 4 → 1；桌面 1440px 掉帧 1 → 0，平均帧率 58.9–60 fps。Lighthouse 移动端 97–100、桌面 100，CLS 0。
+  - 核对与质检：CCI 信条 93/93 段与现场页面逐字一致，讲道 6/6，三大信经 3/3，WS 7/7，正文引号 0 未匹配；Playwright 360 / 390 / 768 / 1024 / 1440 × 13 页 = 65/65 通过（含目录全部展开 / 只看一级 / 展开到二级、逐个折叠按钮、拖宽 / 拖窄 / 双击复原、地图 17 底图切换、全屏），0 溢出 / 裁切 / 重叠 / JS 错误；断网回退测试 3/3（讲解图照常显示并提示）。
 - **2026-11-14（Asia/Taipei）· v2.0.0**
   - 地图：新增 `maps.html` 与 11 幅「讲解图 + 实时地图」模块；本地 Leaflet、11 个底图源自动回退、懒加载、全屏 / 播放。
   - 性能：仅粘性页眉保留 backdrop-filter；背景改为只做 transform 的「浮云」动画；滚动处理不再读取布局；IntersectionObserver 驱动目录高亮与渐显；长区块用 content-visibility；JS 全部 defer；尊重 prefers-reduced-motion；桌面端可选 Lenis 平滑滚动。
@@ -68,7 +72,7 @@
 
 - 版本号规则：`主版本.次版本.修订`。
 - 目录结构：`build/`（Python 生成器；`maps.py` 地图模块、`ess.py` 本质核心、`p_maps.py` 地图页、`palgeo.py` / `geo.py` 底图几何、`verify.py` 逐字核对）、`docs/`（静态站点，GitHub Pages 由 main 分支 `/docs` 发布；`assets/maps.js` 实时地图、`assets/vendor/` 本地 Leaflet 与 Lenis）、`tools/qa.py`（Playwright 多宽度交互质检）。
-- 重建：`cd build && python3 verify.py && python3 build.py`；质检：`WIDTHS=360,390,768,1024,1440 python3 tools/qa.py`（含目录逐级展开 / 折叠与拖动调宽）；性能：`python3 tools/perf.py <标签> [站点目录]`（Playwright 滚动帧率 / 长任务 + Lighthouse 移动 / 桌面）。
+- 重建：`cd build && python3 verify.py && python3 build.py`；质检：`WIDTHS=360,390,768,1024,1440 python3 tools/qa.py`（含目录逐级展开 / 折叠与拖动调宽）；断网回退：`python3 tools/offline.py`；性能：`python3 tools/perf.py <标签> [站点目录]`（Playwright 滚动帧率 / 长任务 + Lighthouse 移动 / 桌面）。
 
 ## ⚠️ 局限
 
