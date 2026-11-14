@@ -1,19 +1,19 @@
 {
  "index": {
   "scroll_mobile": {
-   "frames": 514,
-   "fps": 59.2,
-   "p95_ms": 16.8,
-   "jank_gt50": 1,
-   "longtasks": 1,
-   "lt_total_ms": 89,
+   "frames": 517,
+   "fps": 59.8,
+   "p95_ms": 16.7,
+   "jank_gt50": 0,
+   "longtasks": 0,
+   "lt_total_ms": 0,
    "scrolled": 4480,
    "height": 5621
   },
   "scroll_desktop": {
-   "frames": 513,
-   "fps": 60.0,
-   "p95_ms": 16.7,
+   "frames": 510,
+   "fps": 59.7,
+   "p95_ms": 16.8,
    "jank_gt50": 0,
    "longtasks": 0,
    "lt_total_ms": 0,
@@ -21,58 +21,70 @@
    "height": 3792
   },
   "lh_mobile": {
-   "score": 100,
-   "LCP_ms": 1652,
+   "score": 99,
+   "LCP_ms": 1557,
    "TBT_ms": 0,
    "CLS": 0,
-   "FCP_ms": 1220
+   "FCP_ms": 1557
   },
   "lh_desktop": {
    "score": 100,
-   "LCP_ms": 423,
+   "LCP_ms": 402,
    "TBT_ms": 0,
    "CLS": 0,
-   "FCP_ms": 423
+   "FCP_ms": 345
   }
  },
  "matthew": {
   "scroll_mobile": {
-   "frames": 510,
+   "frames": 508,
    "fps": 59.4,
-   "p95_ms": 16.7,
+   "p95_ms": 16.8,
    "jank_gt50": 1,
    "longtasks": 1,
-   "lt_total_ms": 78,
+   "lt_total_ms": 101,
    "scrolled": 4480,
    "height": 13326
   },
   "scroll_desktop": {
-   "frames": 497,
-   "fps": 58.2,
-   "p95_ms": 16.7,
+   "frames": 490,
+   "fps": 57.5,
+   "p95_ms": 16.8,
    "jank_gt50": 2,
-   "longtasks": 1,
-   "lt_total_ms": 56,
+   "longtasks": 0,
+   "lt_total_ms": 0,
    "scrolled": 9756,
    "height": 9833
   },
-  "lh_mobile": "unsupported operand type(s) for *: 'NoneType' and 'int'",
-  "lh_desktop": "unsupported operand type(s) for *: 'NoneType' and 'int'"
+  "lh_mobile": {
+   "score": 98,
+   "LCP_ms": 1956,
+   "TBT_ms": 5,
+   "CLS": 0,
+   "FCP_ms": 1956
+  },
+  "lh_desktop": {
+   "score": 100,
+   "LCP_ms": 497,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 497
+  }
  },
  "maps": {
   "scroll_mobile": {
-   "frames": 480,
-   "fps": 55.9,
+   "frames": 465,
+   "fps": 54.5,
    "p95_ms": 16.8,
-   "jank_gt50": 6,
-   "longtasks": 7,
-   "lt_total_ms": 561,
-   "scrolled": 4340,
+   "jank_gt50": 5,
+   "longtasks": 6,
+   "lt_total_ms": 633,
+   "scrolled": 4200,
    "height": 12902
   },
   "scroll_desktop": {
-   "frames": 494,
-   "fps": 57.8,
+   "frames": 493,
+   "fps": 57.6,
    "p95_ms": 16.8,
    "jank_gt50": 0,
    "longtasks": 0,
@@ -80,18 +92,30 @@
    "scrolled": 12175,
    "height": 10546
   },
-  "lh_mobile": "unsupported operand type(s) for *: 'NoneType' and 'int'",
-  "lh_desktop": "unsupported operand type(s) for *: 'NoneType' and 'int'"
+  "lh_mobile": {
+   "score": 95,
+   "LCP_ms": 1962,
+   "TBT_ms": 206,
+   "CLS": 0,
+   "FCP_ms": 1652
+  },
+  "lh_desktop": {
+   "score": 100,
+   "LCP_ms": 447,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 409
+  }
  },
  "synoptic": {
   "scroll_mobile": {
-   "frames": 522,
-   "fps": 59.7,
-   "p95_ms": 16.7,
-   "jank_gt50": 1,
-   "longtasks": 1,
-   "lt_total_ms": 60,
-   "scrolled": 4620,
+   "frames": 513,
+   "fps": 59.8,
+   "p95_ms": 16.8,
+   "jank_gt50": 0,
+   "longtasks": 0,
+   "lt_total_ms": 0,
+   "scrolled": 4480,
    "height": 5504
   },
   "scroll_desktop": {
@@ -104,13 +128,25 @@
    "scrolled": 5251,
    "height": 4829
   },
-  "lh_mobile": "unsupported operand type(s) for *: 'NoneType' and 'int'",
-  "lh_desktop": "unsupported operand type(s) for *: 'NoneType' and 'int'"
+  "lh_mobile": {
+   "score": 98,
+   "LCP_ms": 1890,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 1890
+  },
+  "lh_desktop": {
+   "score": 100,
+   "LCP_ms": 390,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 356
+  }
  },
  "creeds": {
   "scroll_mobile": {
-   "frames": 524,
-   "fps": 59.9,
+   "frames": 525,
+   "fps": 60.0,
    "p95_ms": 16.8,
    "jank_gt50": 0,
    "longtasks": 0,
@@ -119,16 +155,28 @@
    "height": 9925
   },
   "scroll_desktop": {
-   "frames": 511,
-   "fps": 59.9,
-   "p95_ms": 16.8,
+   "frames": 503,
+   "fps": 58.9,
+   "p95_ms": 16.7,
    "jank_gt50": 0,
    "longtasks": 0,
    "lt_total_ms": 0,
    "scrolled": 7123,
    "height": 6643
   },
-  "lh_mobile": "unsupported operand type(s) for *: 'NoneType' and 'int'",
-  "lh_desktop": "unsupported operand type(s) for *: 'NoneType' and 'int'"
+  "lh_mobile": {
+   "score": 98,
+   "LCP_ms": 1841,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 1841
+  },
+  "lh_desktop": {
+   "score": 100,
+   "LCP_ms": 461,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 461
+  }
  }
 }

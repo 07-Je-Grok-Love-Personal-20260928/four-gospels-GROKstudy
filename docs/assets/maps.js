@@ -39,6 +39,9 @@ function probe(){
 }
 var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,touch=matchMedia('(pointer:coarse)').matches;
 var lfP=null;
+var Y=(window.scheduler&&scheduler.postTask)?function(f){scheduler.postTask(f,{priority:'background'})}:function(f){setTimeout(f,0)};
+/* 滚动进行中不初始化地图：等滚动停下（app.js 在 html 上维护 .scrolling）再在空闲时执行 */
+function calm(f){if(document.documentElement.classList.contains('scrolling'))return setTimeout(function(){calm(f)},220);(window.requestIdleCallback||function(g){return setTimeout(g,120)})(f,{timeout:2500})}
 function loadLeaflet(){
   if(lfP)return lfP;
   lfP=new Promise(function(res,rej){
@@ -58,6 +61,8 @@ function init(box){
     if(ph)ph.remove();
     var map=L.map(canvas,{center:cfg.c,zoom:cfg.z,scrollWheelZoom:false,dragging:!touch,tap:false,preferCanvas:true,zoomSnap:0.5,worldCopyJump:true,attributionControl:true});
     box._map=map;
+    /* v2.1.0：初始化拆成多个短任务（每步让出主线程），避免一次 100ms+ 的长任务造成滚动掉帧 */
+    Y(function(){
     /* 滚轮只在点按地图后才缩放，避免劫持页面滚动 */
     map.on('click focus',function(){map.scrollWheelZoom.enable()});canvas.addEventListener('mouseleave',function(){map.scrollWheelZoom.disable()});
     var all=[],bounds=[];
@@ -73,6 +78,7 @@ function init(box){
     });
     function fit(){if(bounds.length>1)map.fitBounds(bounds,{padding:[24,24],maxZoom:cfg.z+2,animate:!reduce})}
     if(cfg.fit!==0)fit();
+    Y(function(){
     /* 底图：按钮 + 自动回退 */
     var order=PROV.slice(),first=order.findIndex(function(p){return p.id===cfg.base});if(first>0)order.unshift(order.splice(first,1)[0]);
     var bad={},cur=null,curP=null,timer=null,btns={};
@@ -111,6 +117,7 @@ function init(box){
       else if(!n){status(box,'⚠️ 17 个在线底图在当前网络都连不上。离线讲解图照常可用；路线与地点仍叠加在此。','err')}
       var hs=box.querySelector('.mm-health');if(hs)hs.textContent='📡 底图实测：'+n+'/'+order.length+' 可用';
     });
+    Y(function(){
     /* 工具条 */
     box.querySelectorAll('.mm-btn').forEach(function(b){b.addEventListener('click',function(){
       var a=b.dataset.a;
@@ -141,6 +148,7 @@ function init(box){
     }
     /* 尺寸变化（目录开合、旋转屏幕）时重算 */
     if('ResizeObserver' in window){var rt=0;new ResizeObserver(function(){clearTimeout(rt);rt=setTimeout(function(){map.invalidateSize()},120)}).observe(canvas)}
+    })})})
   }).catch(function(){
     status(box,'⚠️ 地图引擎载入失败，已保留离线讲解图。','err');if(ph)ph.innerHTML='🗺️ 实时地图暂不可用<br><small>请使用左侧离线讲解图</small>';
   });
@@ -149,8 +157,10 @@ function pop(n,i){var d=document.createElement('div');var b=document.createEleme
 var boxes=[].slice.call(document.querySelectorAll('.mm-live'));
 if(!boxes.length)return;
 if('IntersectionObserver' in window){
-  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){io.unobserve(e.target);var t=e.target;probe();(window.requestIdleCallback||function(f){return setTimeout(f,200)})(function(){init(t)},{timeout:1500})}})},{rootMargin:'400px 0px'});
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){io.unobserve(e.target);var t=e.target;calm(function(){probe();init(t)})}})},{rootMargin:'400px 0px'});
   boxes.forEach(function(b){io.observe(b)});
 }else boxes.forEach(init);
+/* 页面静下来后（载入 4 秒且空闲、未在滚动）预先解析 Leaflet，滚到地图时不再有一次性的大脚本执行 */
+addEventListener('load',function(){setTimeout(function(){calm(function(){loadLeaflet()})},4000)});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){var f=document.querySelector('.mm-live.full');if(f){var b=f.querySelector('[data-a=full]');if(b)b.click()}}});
 })();

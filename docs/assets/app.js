@@ -16,10 +16,15 @@ on($('#tocbtn'),'click',function(){tocToggle()});
 on($('#tocx'),'click',function(){tocToggle(false)});
 on($('#scrim'),'click',function(){html.classList.remove('toc-open')});
 /* 目录跳转：屏幕外区块按估计高度占位，跳转后再校正一次落点 */
-function fixLand(t){[260,700].forEach(function(ms){setTimeout(function(){var d=t.getBoundingClientRect().top-70;if(Math.abs(d)>8){if(lenis)lenis.scrollTo(t,{offset:-70,immediate:true});else scrollBy({top:d,behavior:'instant'})}},ms)})}
+/* v2.1.0：跳转 = 立即定位 + 逐帧校正，直到目标标题稳定在顶栏下方（屏幕外区块 content-visibility 的估计高度会在落地后才变成真实高度） */
+function jumpY(y){if(lenis){try{lenis.resize()}catch(x){}lenis.scrollTo(y,{immediate:true,force:true})}else scrollTo({top:y,behavior:'instant'})}
+function goTo(t){var n=0,ok=0;function step(){var d=t.getBoundingClientRect().top-70;if(Math.abs(d)>3){ok=0;jumpY(window.scrollY+d)}else ok++;if(ok<3&&++n<40)setTimeout(step,50)}jumpY(window.scrollY+t.getBoundingClientRect().top-70);setTimeout(step,30)}
+function fixLand(t){goTo(t)}
 $$('#toc a').forEach(function(a){on(a,'click',function(e){if(!wide())html.classList.remove('toc-open');var li0=a.closest('li');if(li0&&li0.classList.contains('has')&&li0.classList.contains('shut'))tocSet(li0,true);var t=document.getElementById(a.getAttribute('href').slice(1));if(!t)return;
-  if(lenis){e.preventDefault();lenis.scrollTo(t,{offset:-70,onComplete:function(){fixLand(t)}});history.replaceState(null,'',a.getAttribute('href'))}
-  else{e.preventDefault();t.scrollIntoView({behavior:'instant',block:'start'});history.replaceState(null,'',a.getAttribute('href'));fixLand(t)}})});
+  e.preventDefault();goTo(t);history.replaceState(null,'',a.getAttribute('href'))})});
+/* 页内锚点（地图总览卡片等）与带 #hash 打开页面时，同样精确落点 */
+document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('main a[href^="#"]');if(!a||e.defaultPrevented)return;var t=document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));if(!t)return;e.preventDefault();goTo(t);history.replaceState(null,'',a.getAttribute('href'))});
+if(location.hash.length>1){var h0=document.getElementById(decodeURIComponent(location.hash.slice(1)));if(h0){if('scrollRestoration' in history)history.scrollRestoration='manual';addEventListener('load',function(){goTo(h0)})}}
 /* 三级目录：折叠 / 展开 */
 function tocSet(li,open){li.classList.toggle('shut',!open);var b=li.querySelector(':scope>.tcr>.tg');if(b)b.setAttribute('aria-expanded',open)}
 $$('#toc .tg').forEach(function(b){on(b,'click',function(e){e.preventDefault();var li=b.closest('li');tocSet(li,li.classList.contains('shut'))})});
