@@ -2,3 +2,4 @@ CNAME
 build/qa/
 __pycache__/
 *.pyc
+build/perf/lh_*

@@ -1,0 +1,134 @@
+{
+ "index": {
+  "scroll_mobile": {
+   "frames": 514,
+   "fps": 59.2,
+   "p95_ms": 16.8,
+   "jank_gt50": 1,
+   "longtasks": 1,
+   "lt_total_ms": 89,
+   "scrolled": 4480,
+   "height": 5621
+  },
+  "scroll_desktop": {
+   "frames": 513,
+   "fps": 60.0,
+   "p95_ms": 16.7,
+   "jank_gt50": 0,
+   "longtasks": 0,
+   "lt_total_ms": 0,
+   "scrolled": 3815,
+   "height": 3792
+  },
+  "lh_mobile": {
+   "score": 100,
+   "LCP_ms": 1652,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 1220
+  },
+  "lh_desktop": {
+   "score": 100,
+   "LCP_ms": 423,
+   "TBT_ms": 0,
+   "CLS": 0,
+   "FCP_ms": 423
+  }
+ },
+ "matthew": {
+  "scroll_mobile": {
+   "frames": 510,
+   "fps": 59.4,
+   "p95_ms": 16.7,
+   "jank_gt50": 1,
+   "longtasks": 1,
+   "lt_total_ms": 78,
+   "scrolled": 4480,
+   "height": 13326
+  },
+  "scroll_desktop": {
+   "frames": 497,
+   "fps": 58.2,
+   "p95_ms": 16.7,
+   "jank_gt50": 2,
+   "longtasks": 1,
+   "lt_total_ms": 56,
+   "scrolled": 9756,
+   "height": 9833
+  },
+  "lh_mobile": "unsupported operand type(s) for *: 'NoneType' and 'int'",
+  "lh_desktop": "unsupported operand type(s) for *: 'NoneType' and 'int'"
+ },
+ "maps": {
+  "scroll_mobile": {
+   "frames": 480,
+   "fps": 55.9,
+   "p95_ms": 16.8,
+   "jank_gt50": 6,
+   "longtasks": 7,
+   "lt_total_ms": 561,
+   "scrolled": 4340,
+   "height": 12902
+  },
+  "scroll_desktop": {
+   "frames": 494,
+   "fps": 57.8,
+   "p95_ms": 16.8,
+   "jank_gt50": 0,
+   "longtasks": 0,
+   "lt_total_ms": 0,
+   "scrolled": 12175,
+   "height": 10546
+  },
+  "lh_mobile": "unsupported operand type(s) for *: 'NoneType' and 'int'",
+  "lh_desktop": "unsupported operand type(s) for *: 'NoneType' and 'int'"
+ },
+ "synoptic": {
+  "scroll_mobile": {
+   "frames": 522,
+   "fps": 59.7,
+   "p95_ms": 16.7,
+   "jank_gt50": 1,
+   "longtasks": 1,
+   "lt_total_ms": 60,
+   "scrolled": 4620,
+   "height": 5504
+  },
+  "scroll_desktop": {
+   "frames": 510,
+   "fps": 59.9,
+   "p95_ms": 16.8,
+   "jank_gt50": 0,
+   "longtasks": 0,
+   "lt_total_ms": 0,
+   "scrolled": 5251,
+   "height": 4829
+  },
+  "lh_mobile": "unsupported operand type(s) for *: 'NoneType' and 'int'",
+  "lh_desktop": "unsupported operand type(s) for *: 'NoneType' and 'int'"
+ },
+ "creeds": {
+  "scroll_mobile": {
+   "frames": 524,
+   "fps": 59.9,
+   "p95_ms": 16.8,
+   "jank_gt50": 0,
+   "longtasks": 0,
+   "lt_total_ms": 0,
+   "scrolled": 4620,
+   "height": 9925
+  },
+  "scroll_desktop": {
+   "frames": 511,
+   "fps": 59.9,
+   "p95_ms": 16.8,
+   "jank_gt50": 0,
+   "longtasks": 0,
+   "lt_total_ms": 0,
+   "scrolled": 7123,
+   "height": 6643
+  },
+  "lh_mobile": "unsupported operand type(s) for *: 'NoneType' and 'int'",
+  "lh_desktop": "unsupported operand type(s) for *: 'NoneType' and 'int'"
+ }
+}
