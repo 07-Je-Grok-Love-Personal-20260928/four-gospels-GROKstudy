@@ -34,6 +34,39 @@ async def run_page(pg, url, f, w, errs):
     await pg.wait_for_timeout(900)
     if w>1100 and not await pg.evaluate(TV): log.append("toc not restored")
     if w<=1100 and await pg.evaluate(TV): log.append("mobile toc not closed")
+    # 1b TOC 三级折叠 + 拖动调宽（v2.1.0）
+    if w<=1100: await safe_click(pg, pg.locator("#tocbtn"), log, "tocbtn-open"); await pg.wait_for_timeout(450)
+    for tx in ["all","l1","l2","all"]:
+        await safe_click(pg, pg.locator(f'#toc [data-tx="{tx}"]'), log, "toc-"+tx); await pg.wait_for_timeout(80)
+        if tx=="l1" and await pg.evaluate("[...document.querySelectorAll('#toc li.l2')].some(e=>e.offsetParent)"): log.append("toc l1-only still shows l2")
+        if tx=="all" and await pg.evaluate("[...document.querySelectorAll('#toc li.l3,#toc li.l2')].some(e=>!e.offsetParent)"): log.append("toc expand-all hides items")
+    tg=pg.locator("#toc .tg"); ntg=await tg.count(); stats["toc_tg"]=ntg; stats["toc_lv"]=await pg.evaluate("[1,2,3].map(l=>document.querySelectorAll('#toc li.l'+l).length)")
+    for k in range(ntg):
+        if await tg.nth(k).is_visible(): await tg.nth(k).click(timeout=2000); await tg.nth(k).click(timeout=2000)
+    async def toc_ok(tag):
+        r=await pg.evaluate("""(()=>{const t=document.querySelector('#toc'),tr=t.getBoundingClientRect();const bad=[...t.querySelectorAll('a,button,input')].filter(e=>e.offsetParent).filter(e=>{const r=e.getBoundingClientRect();return r.right>tr.right+1||r.left<tr.left-1}).length;return {sw:t.scrollWidth,cw:t.clientWidth,bad,vw:innerWidth,right:tr.right}})()""")
+        if r["sw"]>r["cw"]+1 or r["bad"] or r["right"]>r["vw"]+1: log.append(f"toc overflow {tag} {r}")
+    await toc_ok("expanded")
+    rs=pg.locator("#tocrs")
+    if await rs.is_visible():
+        bb=await rs.bounding_box(); x0=bb["x"]+bb["width"]/2; y0=bb["y"]+min(300,bb["height"]/2)
+        w0=await pg.evaluate("document.querySelector('#toc').getBoundingClientRect().width")
+        await pg.mouse.move(x0,y0); await pg.mouse.down(); await pg.mouse.move(x0+160,y0,steps=6); await pg.mouse.up(); await pg.wait_for_timeout(250)
+        w1=await pg.evaluate("document.querySelector('#toc').getBoundingClientRect().width")
+        if w1<=w0+20 and w0<min(720,w*0.6)-30: log.append(f"toc drag-wider failed {w0}->{w1}")
+        await toc_ok("wide")
+        if w>1100:
+            ml=await pg.evaluate("document.querySelector('main').getBoundingClientRect().left")
+            if abs(ml-w1)>2: log.append(f"main not following toc width {ml} vs {w1}")
+        bb=await rs.bounding_box(); await pg.mouse.move(bb["x"]+bb["width"]/2,y0); await pg.mouse.down(); await pg.mouse.move(40,y0,steps=6); await pg.mouse.up(); await pg.wait_for_timeout(250)
+        w2=await pg.evaluate("document.querySelector('#toc').getBoundingClientRect().width")
+        if w2<219: log.append(f"toc min clamp failed {w2}")
+        await toc_ok("narrow"); stats["toc_drag"]=[round(w0),round(w1),round(w2)]
+        if await pg.evaluate("document.documentElement.scrollWidth>document.documentElement.clientWidth"): log.append("page overflow after toc drag")
+        await rs.dblclick(); await pg.wait_for_timeout(200)
+    if w<=1100:
+        await safe_click(pg, pg.locator("#tocx"), log, "tocx"); await pg.wait_for_timeout(450)
+        if await pg.evaluate(TV): log.append("toc not closed by tocx")
     # 2 nav dropdown (mobile)
     if await pg.locator("#navbtn").is_visible():
         await safe_click(pg, pg.locator("#navbtn"), log, "navbtn"); await pg.wait_for_timeout(200)

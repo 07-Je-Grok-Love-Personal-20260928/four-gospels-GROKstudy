@@ -2,7 +2,7 @@
 import json, re, html as H
 from bible import verses
 CCI = "/workspace/cci"
-VER = "v2.0.0"; DATE = "2026-11-14"; ASSET_V = "20261114a"
+VER = "v2.1.0"; DATE = "2026-11-14"; ASSET_V = "20261114c"
 def strip(t): return re.sub(r'\^\d+', '', t)
 _c = json.load(open(f"{CCI}/creeds.json")); _h = json.load(open(f"{CCI}/heidelberg.json"))
 _b = json.load(open(f"{CCI}/belgic.json")); _d = json.load(open(f"{CCI}/dort.json"))
@@ -82,18 +82,45 @@ NAV = [("index.html","🏠","首页总览"),("bible.html","📜","整本圣经·
        ("synoptic.html","🔀","对观·和谐·受难周"),("doctrine.html","🧭","教义主题·信条"),("creeds.html","✝️","三大信经"),
        ("memory.html","🧠","记忆·自测"),("sources.html","🔖","来源·校验")]
 
+CN = "一二三四五六七八九十"
+def cnum(n): return CN[n-1] if n <= 10 else ("十" + CN[n-11] if n < 20 else str(n))
+def number_body(body):
+    """v2.1.0：h2 统一编号「一、二、…」；为没有 id 的 h4 补 id，使 h2/h3/h4 对应目录三级。"""
+    k = [0]
+    def h2(m):
+        k[0] += 1; txt = re.sub(r'[一二三四五六七八九十]+、\s*', '', m.group(3), count=1)
+        return f'<h2 id="{m.group(1)}"{m.group(2)}><span class="hn">{cnum(k[0])}、</span>{txt}</h2>'
+    body = re.sub(r'<h2 id="([^"]+)"([^>]*)>(.*?)</h2>', h2, body)
+    n = [0]
+    def h4(m):
+        n[0] += 1; return f'<h4 id="h4-{n[0]}"{m.group(1)}>'
+    body = re.sub(r'<h4(?![^>]*\bid=)([^>]*)>', h4, body)
+    return body
 def toc_from(body):
-    items = re.findall(r'<h([23]) id="([^"]+)"[^>]*>(.*?)</h\1>', body)
-    out = ['<ol class="toc-l">']; open2 = False
+    items = re.findall(r'<h([234]) id="([^"]+)"[^>]*>(.*?)</h\1>', body)
+    tree = []
     for lv, i, t in items:
-        txt = re.sub(r'<[^>]+>', '', t)
-        if lv == '2':
-            if open2: out.append('</ol></li>')
-            out.append(f'<li><a href="#{i}" class="t2">{txt}</a><ol>'); open2 = True
+        num = ""
+        m = re.match(r'<span class="hn">(.*?)</span>', t)
+        if m: num = m.group(1); t = t[m.end():]
+        txt = re.sub(r'<[^>]+>', '', t).strip()
+        node = {"lv": int(lv), "id": i, "t": txt, "n": num, "c": []}
+        if node["lv"] == 2 or not tree: tree.append(node)
+        elif node["lv"] == 3: tree[-1]["c"].append(node)
         else:
-            out.append(f'<li><a href="#{i}" class="t3">{txt}</a></li>')
-    if open2: out.append('</ol></li>')
-    out.append('</ol>'); return "".join(out)
+            par = tree[-1]["c"][-1] if tree[-1]["c"] else tree[-1]
+            par["c"].append(node)
+    def render(nodes, depth):
+        out = []
+        for k, nd in enumerate(nodes, 1):
+            num = nd["n"] or (f"{k}." if depth == 2 else "·")
+            has = bool(nd["c"])
+            tg = f'<button type="button" class="tg" aria-label="展开/折叠" aria-expanded="{"true" if depth==1 else "false"}"></button>' if has else '<span class="tg0"></span>'
+            sub = f'<ol class="lv{depth+1}">{render(nd["c"], depth+1)}</ol>' if has else ""
+            cls = f'l{depth}' + (' has' if has else '') + ('' if depth == 1 or not has else ' shut')
+            out.append(f'<li class="{cls}"><div class="tcr">{tg}<a href="#{nd["id"]}" class="t{depth+1}"><span class="tn">{num}</span><span class="tt">{esc(nd["t"])}</span></a></div>{sub}</li>')
+        return "".join(out)
+    return f'<ol class="toc-l lv1">{render(tree, 1)}</ol>'
 
 LEGEND = [("key","重点","**金色粗体 + 荧光底**","必须记住的核心句、核心教义"),
           ("chr","基督·福音核心","^^玫红粗体 + 实线下划线^^","指向基督位格与工作的枢纽句"),
@@ -110,7 +137,12 @@ def legend_bar():
             '<span class="lgc"><span class="lg-cci">📘📗📕📙</span><small>信条逐字引文（左边框颜色区分）</small></span>'
             '<span class="lg-tools"><button type="button" class="btn sm" id="markbtn" aria-pressed="true">🖍️ 标记：开</button><button type="button" class="btn sm" id="smoothbtn" aria-pressed="true">🌊 顺滑滚动：开</button></span></div></details>')
 
+def _quick(fn):
+    from quick import quick
+    g = {"matthew.html":"mat","mark.html":"mrk","luke.html":"luk","john.html":"jhn"}.get(fn)
+    return quick(fn, g)
 def page(fn, title, sub, body, hero_cls="", extra_head=""):
+    body = number_body(body)
     nav = "".join(f'<a href="{h}" class="{"on" if h==fn else ""}"><span>{i}</span>{t}</a>' for h, i, t in NAV)
     idx = [h for h, _, _ in NAV].index(fn)
     prv = NAV[idx-1] if idx > 0 else None; nxt = NAV[idx+1] if idx < len(NAV)-1 else None
@@ -118,16 +150,17 @@ def page(fn, title, sub, body, hero_cls="", extra_head=""):
     maps_js = f'<script src="assets/maps.js?v={ASSET_V}" defer></script>' if 'class="mapmod"' in body else ''
     return f'''<!doctype html><html lang="zh-CN" data-theme="night"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>{esc(title) + " · " if title != "四福音书深读" else ""}四福音书深读 GROKstudy · {DATE} {VER}</title><meta name="description" content="{esc(sub)}"><meta name="theme-color" content="#0b1226"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E✝️%3C/text%3E%3C/svg%3E">
-<script>try{{var d=document.documentElement,t=localStorage.getItem('fg-theme');if(t)d.dataset.theme=t;if(localStorage.getItem('fg-toc')==='0')d.classList.add('toc-off');if(localStorage.getItem('fg-mark')==='0')d.classList.add('nomark')}}catch(e){{}}</script>
+<script>try{{var d=document.documentElement,t=localStorage.getItem('fg-theme');if(t)d.dataset.theme=t;if(localStorage.getItem('fg-toc')==='0')d.classList.add('toc-off');if(localStorage.getItem('fg-mark')==='0')d.classList.add('nomark');var w=+localStorage.getItem('fg-tocw');if(w>=220&&w<=720)d.style.setProperty('--tocw',w+'px')}}catch(e){{}}</script>
 <link rel="stylesheet" href="assets/style.css?v={ASSET_V}">{extra_head}</head><body>
 <div class="sky" aria-hidden="true"><i class="c1"></i><i class="c2"></i><i class="c3"></i><i class="c4"></i></div><div id="prog"></div>
 <header class="top"><button id="tocbtn" class="ib" aria-label="目录" title="显示/隐藏目录 (T)">☰</button><a class="brand" href="index.html">✝️ 四福音书<b>深读</b></a>
 <nav class="mainnav">{nav}</nav><button id="navbtn" class="ib" aria-label="页面菜单">▦</button><button id="markbtn2" class="ib" aria-label="标记开关" title="重点标记 开/关 (M)">🖍️</button><button id="themebtn" class="ib" aria-label="切换主题" title="切换明暗">🌗</button></header>
 <div class="navdrop" id="navdrop">{nav}</div>
-<aside id="toc" aria-label="本页目录"><div class="toc-h"><b>📑 本页目录</b><input id="tocq" type="search" placeholder="筛选目录…" aria-label="筛选目录"><button class="ib sm" id="tocx" aria-label="收起目录">✕</button></div>{toc_from(body)}</aside>
+<aside id="toc" aria-label="本页目录"><div class="toc-h"><b>📑 本页目录</b><input id="tocq" type="search" placeholder="筛选目录…" aria-label="筛选目录"><button class="ib sm" id="tocx" aria-label="收起目录">✕</button><span class="toc-tools"><button type="button" class="btn sm" data-tx="all">⊞ 全部展开</button><button type="button" class="btn sm" data-tx="l1">☰ 只看一级</button><button type="button" class="btn sm" data-tx="l2">≡ 展开到二级</button></span></div>{toc_from(body)}</aside><div id="tocrs" role="separator" aria-orientation="vertical" aria-label="拖动调整目录宽度（双击复原）" tabindex="0" title="拖动调整目录宽度 · 双击复原"><i></i></div>
 <div id="scrim"></div>
 <main id="main"><section class="hero {hero_cls}"><div class="hero-in"><p class="eyebrow">四福音书 · 欧陆改革宗深读 · {VER} · {DATE}</p><h1>{title}</h1><p class="sub">{sub}</p></div></section>
 {legend_bar()}
+{_quick(fn)}
 {body}
 {pn}
 <footer class="foot"><p>四福音书深读 · 四福音书-{DATE.replace("-","")}-{VER}-GROKstudy · 信经与信条引文逐字取自 <a href="https://ccifellowship.org/books/book-of-praise" target="_blank" rel="noopener">ccifellowship.org《敬拜手册》</a>（构建时程序核对）；经文为和合本。讲解、图表与口诀为本站学习整理。</p></footer>

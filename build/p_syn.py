@@ -56,7 +56,7 @@ def build():
     b.append('<div class="pweek">'+"".join(f'<div class="pd2 glass reveal" style="--i:{i}"><span class="pic">{ic}</span><b>{d}</b><p>{md(t)}</p><small>{esc(r)}</small></div>' for i,(d,ic,t,r) in enumerate(PW))+'</div>')
     b.append('<p class="note">'+md("“星期三”的事件是推定；约翰福音以“逾越节前六日”（{{约12:1}}）开始倒数。受难日依多数学者为星期五。")+'</p>')
     b.append('<h3 id="s3b">✝️ 十架七言（传统次序）</h3><div class="words">'+"".join(f'<div class="wd glass reveal" style="--i:{i}"><span class="wn">{i+1}</span><b>{esc(t)}</b><small>{r} · {k}</small></div>' for i,(t,r,k) in enumerate(WORDS))+'</div>')
-    b.append('<p class="note">'+md("记忆口诀：**赦 · 救 · 托 · 弃 · 渴 · 成 · 交**。前三句为人代求，中间“离弃”是最深的黑暗（担当罪的咒诅），最后三句是完成与交托。")+'</p>')
+    b.append('<p class="note">'+md("记忆口诀：**赦 · 救 · 托 · 弃 · 渴 · 成 · 交**。前三句为别人（敌人、罪人、母亲），中间“离弃”是最深的黑暗（担当罪的咒诅），最后三句是完成与交托。")+'</p>')
     b.append(cq(("hc",44)))
     b.append('<h2 id="s4">四、复活显现</h2>'+tbl(["向谁显现","地点","经文"],APPEAR))
     b.append('<div class="callout"><b>🌅 复活的历史证据：</b>'+md("①空坟（连敌对者也承认，{{太28:11-15}}）；②多次、多人、多地的显现（{{林前15:5-8}}）；③门徒从惧怕到放胆、甘心殉道；④妇女作第一见证人——在当时女子的证词不被重视，编造者不会这样写。")+'</div>'+cq(("hc",45)))

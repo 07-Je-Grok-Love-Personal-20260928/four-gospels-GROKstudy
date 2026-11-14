@@ -44,8 +44,9 @@ def essence(e):
     pil="".join(f'<div class="pil" style="--i:{k}"><span class="pi">{a}</span><b>{esc(t)}</b><p>{md(d)}</p></div>' for k,(a,t,d) in enumerate(x["ess"]))
     ln='<div class="otnt">'+"".join(f'<div class="on{k}"><small>{lab}</small><p>{md(t)}</p></div>'+('<i>➜</i>' if k<2 else '') for k,(lab,t) in enumerate(zip(["📜 旧约的应许","✝️ 在基督里应验","⛪ 在教会中延续"],x["line"])))+'</div>'
     tr="".join(f'<div class="trap"><p class="tw">❌ {md(a)}</p><p class="tr2">✅ {md(b)}</p></div>' for a,b in x["trap"])
-    return (f'<div class="ess"><p class="one">💎 {md(x["one"])}</p><div class="pils">{pil}</div>{ln}'
-            f'<div class="callout c-warn"><b>🚫 常见误区 vs ✅ 改革宗正解</b>{tr}</div>'
+    gid=e["id"]
+    return (f'<div class="ess"><h3 id="{gid}-e1">🎯 一句话 · 三支柱</h3><p class="one">💎 {md(x["one"])}</p><div class="pils">{pil}</div><h3 id="{gid}-e2">🔗 一条线：旧约 → 基督 → 教会</h3>{ln}'
+            f'<h3 id="{gid}-e3">🚫 误区与记忆链</h3><div class="callout c-warn"><b>🚫 常见误区 vs ✅ 改革宗正解</b>{tr}</div>'
             f'<div class="callout c-mem"><b>🧠 记忆链</b><p class="chain">{md(x["chain"])}</p></div></div>')
 def gospel(e):
     i=e["id"]
@@ -62,18 +63,46 @@ def gospel(e):
     loc = "写作地与原初读者所在地" if e["fr"]!=e["dest"] else "写作地（传统说法）"
     return f'''<section class="ep" id="{i}" style="--gc:{e["col"]}">
 <div class="ep-banner glass reveal"><div class="kwbox"><span class="kwl">钥字</span><span class="kw">{e["kw"]}</span></div><p class="core">💎 {md(e["core"])}</p>{verse_card(e["kv"])}</div>
-<h2 id="{i}-ess">💎 本质核心：一句话 · 三支柱 · 一条线</h2>{essence(e)}
-<h2 id="{i}-f">🪪 基本资料</h2><div class="facts-wrap"><div class="facts">{fx}</div><figure class="mm glass">{minimap(e)}<figcaption>{loc}（真实底图：Natural Earth；按经纬度定位）</figcaption></figure></div>
-<h2 id="{i}-geo">🗺️ 地理足迹：讲解图 + 实时地图</h2>{maps.gospel_geo(e)}
-<h2 id="{i}-bg">🏺 背景与真实情境</h2><div class="two"><div class="card glass"><h4>历史背景</h4><p>{md(e["bg"])}</p></div><div class="card glass culture"><h4>🌍 文化区域特征</h4><p>{md(e["cul"])}</p></div></div>
-<h2 id="{i}-why">❓ 为什么写（前因后果）</h2>{flow(e["why"], "于是写下《"+e["n"]+"》")}
-<h2 id="{i}-what">📐 写了什么（结构）</h2>{sbar(e["ol"])}<ol class="outline">{ol}</ol>{mindtree(e)}<div class="angs">{angs}</div>
+<h2 id="{i}-ess">💎 本质核心</h2>{essence(e)}
+<h2 id="{i}-ctx">🏺 背景：谁 · 何时 · 何地 · 为什么</h2>
+<h3 id="{i}-f">🪪 基本资料</h3><div class="facts-wrap"><div class="facts">{fx}</div><figure class="mm glass">{minimap(e)}<figcaption>{loc}（真实底图：Natural Earth；按经纬度定位）</figcaption></figure></div>
+<h3 id="{i}-bg">🌍 历史背景与文化区域</h3><div class="two"><div class="card glass"><h4>🏛️ 历史背景</h4><p>{md(e["bg"])}</p></div><div class="card glass culture"><h4>🧭 文化区域特征</h4><p>{md(e["cul"])}</p></div></div>
+<h3 id="{i}-why">❓ 为什么写（前因后果）</h3>{flow(e["why"], "于是写下《"+e["n"]+"》")}
+<h2 id="{i}-geo">🗺️ 地理足迹</h2>
+<h3 id="{i}-rhy">🧭 地理节奏条：一章一格</h3>{rhythm(e)}
+<h3 id="{i}-map">🛰️ 讲解图 + 实时地图</h3>{maps.gospel_geo(e)}
+<h2 id="{i}-what">📐 写了什么：结构与独特材料</h2>
+<h3 id="{i}-ol">🧱 全书结构</h3>{sbar(e["ol"])}<ol class="outline">{ol}</ol>{mindtree(e)}<div class="angs">{angs}</div>
 <h3 id="{i}-uq">🔎 本卷独有的材料</h3><div class="card glass"><ul class="keys">{uq}</ul></div>
 {SPECIAL[i]()}
-<h2 id="{i}-bt">📜 圣经神学：在整本圣经中的位置</h2><div class="card glass bt"><p>{md(e["bt"])}</p></div>
-<h2 id="{i}-ct">🤝 圣约神学</h2><div class="card glass ct"><p>{md(e["ct"])}</p></div>
-<h2 id="{i}-kh">🎯 重点与难点</h2><div class="two"><div class="card glass"><h4>⭐ 重点</h4><ul class="keys">{keys}</ul></div><div class="card glass"><h4>⚠️ 难点（点开看改革宗解答）</h4>{hards}</div></div>
-<h2 id="{i}-cf">📘 信条对照（CCI 逐字）</h2><div class="confs">{confs}</div>
+<h2 id="{i}-th">📜 神学：圣经神学 · 圣约神学</h2>
+<h3 id="{i}-bt">📖 圣经神学：在整本圣经中的位置</h3><div class="card glass bt"><p>{md(e["bt"])}</p></div>
+<h3 id="{i}-ct">🤝 圣约神学</h3><div class="card glass ct"><p>{md(e["ct"])}</p></div>
+<h3 id="{i}-kh">🎯 重点与难点</h3><div class="two"><div class="card glass"><h4>⭐ 重点</h4><ul class="keys">{keys}</ul></div><div class="card glass"><h4>⚠️ 难点（点开看改革宗解答）</h4>{hards}</div></div>
+<h2 id="{i}-cfs">📘 信条与讲道（CCI 逐字）</h2>
+<h3 id="{i}-cf">📘 信条对照</h3><div class="confs">{confs}</div>
 <h3 id="{i}-sm">🎙️ CCI 讲道节录</h3><div class="confs">{serm}</div>
-<h2 id="{i}-ap">🌱 应用与记忆</h2><div class="two"><div class="card glass"><h4>今天怎样活</h4><ul class="apps">{apps}</ul></div><div class="flip" tabindex="0" role="button" aria-label="翻转记忆卡"><div class="fi-in"><div class="ff"><span>🧠 记忆钩</span><b>{e["n"]}</b><em>点按翻转</em></div><div class="fb"><p>{md(e["mn"])}</p></div></div></div></div>
+<h2 id="{i}-ap">🌱 应用与记忆</h2><div class="two"><div class="card glass"><h4>🌱 今天怎样活</h4><ul class="apps">{apps}</ul></div><div class="flip" tabindex="0" role="button" aria-label="翻转记忆卡"><div class="fi-in"><div class="ff"><span>🧠 记忆钩</span><b>{e["n"]}</b><em>点按翻转</em></div><div class="fb"><p>{md(e["mn"])}</p></div></div></div></div>
 </section>'''
+# ---------- v2.1.0 地理节奏条：一章一格 ----------
+RG = {"B":("#a78bfa","降生·幼年"),"J":("#fb923c","约旦河·旷野"),"G":("#2dd4bf","加利利"),"X":("#60a5fa","外邦·边境"),"S":("#a3e635","撒玛利亚"),"R":("#ffc94a","上耶路撒冷的路"),"Jr":("#ff5c93","耶路撒冷·犹太")}
+RHY = {
+ "mat": (["B","B","J","J|G","G","G","G","G","G","G","G","G","G","G","X","X","G","G","R","R","Jr","Jr","Jr","Jr","Jr","Jr","Jr","Jr|G"], {16:"彼得认信",21:"进城",28:"大使命"}, "1–2 降生 → 3–4 受洗受试探 → 4:12–18 加利利 → 19–20 上路 → 21–28 耶路撒冷（28:16 回到加利利山上）"),
+ "mrk": (["J|G","G","G","G","X","G","X","G|X","G","R","Jr","Jr","Jr","Jr","Jr","Jr"], {8:"彼得认信 8:29",11:"进城",15:"十字架"}, "前半部（1–8）全在北方：加利利与外邦边境；8:29 是分水岭；10 章上路；11–16 章只有一周，却占全书三分之一以上"),
+ "luk": (["B","B","J","J|G","G","G","G","G","G|R","R","R","R","R","R","R","R","R","R","R|Jr","Jr","Jr","Jr","Jr","Jr"], {9:"定意上耶路撒冷 9:51",19:"进城",24:"以马忤斯"}, "路加的特色是那条长路：9:51–19:27 约十章篇幅都在「往耶路撒冷去」的旅程上——门徒训练就在路上完成"),
+ "jhn": (["J","G|Jr","Jr","S|G","Jr","G","Jr","Jr","Jr","Jr|J","Jr","Jr","Jr","Jr","Jr","Jr","Jr","Jr","Jr","Jr","G"], {2:"逾越节",5:"节期",6:"逾越节",7:"住棚节",10:"修殿节",12:"逾越节"}, "约翰在加利利与耶路撒冷之间往返，按节期推进（三次逾越节 → 事工约三年）；13–20 章几乎全在耶路撒冷"),
+}
+def rhythm(e):
+    i = e["id"]; ch, marks, cap = RHY[i]; n = len(ch); W = 940; cw = (W-20)/n; H = 128
+    s = [f'<figure class="rhy glass reveal" style="--gc:{e["col"]}"><div class="rsc"><svg viewBox="0 0 {W} {H}" role="img" aria-label="{e["n"]}地理节奏条">']
+    for k, c in enumerate(ch):
+        x = 10 + k*cw; parts = c.split("|")
+        for j, p in enumerate(parts):
+            col = RG[p][0]; h = 46/len(parts)
+            s.append(f'<rect class="rc" x="{x+1:.1f}" y="{40+j*h:.1f}" width="{cw-2:.1f}" height="{h-(1 if len(parts)>1 else 0):.1f}" rx="4" fill="{col}" style="--k:{k}"><title>第 {k+1} 章 · {RG[p][1]}</title></rect>')
+        s.append(f'<text x="{x+cw/2:.1f}" y="104" text-anchor="middle" class="rn2">{k+1}</text>')
+        if k+1 in marks:
+            mi = sorted(marks).index(k+1); ty = 14 if mi % 2 == 0 else 31
+            s.append(f'<line x1="{x+cw/2:.1f}" y1="38" x2="{x+cw/2:.1f}" y2="{ty+3}" class="rml"/><text x="{x+cw/2+(4 if k>=2 and k<=n-3 else 0):.1f}" y="{ty}" text-anchor="{"end" if k > n-3 else "start" if k < 2 else "middle"}" class="rmt">{esc(marks[k+1])}</text>')
+    s.append('</svg></div><div class="rlg">' + "".join(f'<span style="--c:{RG[r][0]}">{RG[r][1]}</span>' for r in dict.fromkeys(x for c in ch for x in c.split("|"))) + f'</div><figcaption>{md(cap)}</figcaption></figure>')
+    return "".join(s)

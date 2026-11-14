@@ -45,10 +45,10 @@ def module(mid, ic, title, sub, concept, live, notes, color="#ffc94a", caption="
     data = esc(json.dumps(live, ensure_ascii=False, separators=(",", ":")))
     return (f'<figure class="mapmod" id="{mid}" style="--mc:{color}"><header class="mm-h"><span class="mm-ic">{ic}</span><div><b>{esc(title)}</b><small>{md(sub)}</small></div></header>'
             f'<div class="mm-grid"><div class="mm-concept"><div class="mm-tag">🎨 讲解图 · 离线可用</div>{concept}<div class="mm-info" aria-live="polite">👆 点按图中地点，查看事件与经文。</div></div>'
-            f'<div class="mm-live" data-map="{data}"><div class="mm-tag">🛰️ 实时地图 · 多源自动切换</div><div class="mm-layers" role="group" aria-label="底图来源"></div>'
+            f'<div class="mm-live" data-map="{data}"><div class="mm-tag">🛰️ 实时地图 · 17 源实测 · 自动切换</div><div class="mm-layers" role="group" aria-label="底图来源"></div>'
             f'<div class="mm-canvas" role="region" aria-label="{esc(title)}实时地图"><div class="mm-ph">🛰️ 滑动到这里时自动载入实时地图……<br><small>若网络不通，左侧讲解图照常可用</small></div></div>'
             f'<div class="mm-bar"><button type="button" class="mm-btn" data-a="fit">🎯 全部地点</button><button type="button" class="mm-btn" data-a="play">▶ 播放路线</button><button type="button" class="mm-btn" data-a="drag">✋ 拖动</button><button type="button" class="mm-btn" data-a="full">⛶ 全屏</button></div>'
-            f'<div class="mm-status" aria-live="polite">底图：待载入</div></div></div>'
+            f'<div class="mm-status" aria-live="polite">底图：待载入</div><div class="mm-health" aria-live="polite"></div></div></div>'
             f'<ul class="mm-notes">{nt}</ul>{f"<figcaption>{md(caption)}</figcaption>" if caption else ""}</figure>')
 
 # ---------- 底图符号（内联，避免外部文件加载失败） ----------

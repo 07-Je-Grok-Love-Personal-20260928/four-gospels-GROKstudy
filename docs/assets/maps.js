@@ -1,20 +1,42 @@
-/* 四福音书深读 v2.0.0 · 实时地图：本地 Leaflet 1.9.4 懒加载；11 个全球底图；瓦片失败自动回退；全部失败保留离线讲解图 */
+/* 四福音书深读 v2.1.0 · 实时地图：本地 Leaflet 1.9.4 懒加载；17 个实测全球底图 + 健康探测；瓦片失败自动回退；全部失败保留离线讲解图 */
 (function(){
 "use strict";
-var OSM='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
+var OSM='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',ESRI='Tiles &copy; Esri';
+/* v2.1.0：17 个底图源均经实测（2026-11-14，耶路撒冷 z6/z9/z12 返回真实瓦片）；已剔除需密钥 / 返回占位图的 CARTO、Stadia、Thunderforest、Wikimedia、Mapy。mz = 原生最大缩放（超出则放大显示，避免“Map data not yet available”占位图） */
 var PROV=[
- {id:'esri-street',n:'Esri 街道',u:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',a:'Tiles &copy; Esri',mz:19},
- {id:'osm',n:'OpenStreetMap',u:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',a:OSM,mz:19},
- {id:'esri-topo',n:'Esri 地形',u:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',a:'Tiles &copy; Esri',mz:19},
- {id:'esri-img',n:'Esri 卫星',u:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',a:'Imagery &copy; Esri, Maxar, Earthstar Geographics',mz:19},
- {id:'otm',n:'OpenTopoMap 等高线',u:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',s:'abc',a:OSM+', SRTM | &copy; <a href="https://opentopomap.org" target="_blank" rel="noopener">OpenTopoMap</a> (CC-BY-SA)',mz:17},
- {id:'dare',n:'DARE 罗马帝国',u:'https://dh.gu.se/tiles/imperium/{z}/{x}/{y}.png',a:'&copy; <a href="https://dh.gu.se/dare/" target="_blank" rel="noopener">DARE</a> Johan Åhlfeldt, University of Gothenburg',mz:11},
- {id:'gaode',n:'高德（中文）',u:'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',s:'1234',a:'&copy; 高德地图 AutoNavi',mz:18},
- {id:'osm-de',n:'OSM 德国镜像',u:'https://tile.openstreetmap.de/{z}/{x}/{y}.png',a:OSM+' (openstreetmap.de)',mz:19},
- {id:'esri-natgeo',n:'Esri 国家地理',u:'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',a:'Tiles &copy; Esri, National Geographic',mz:16},
- {id:'osm-hot',n:'OSM 人道主义',u:'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',s:'abc',a:OSM+', Tiles HOT / OSM France',mz:19},
- {id:'esri-dark',n:'Esri 夜色',u:'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',a:'Tiles &copy; Esri',mz:16}
+ {id:'esri-street',g:'🛣️',n:'Esri 街道',u:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',a:ESRI,mz:19},
+ {id:'osm',g:'🛣️',n:'OpenStreetMap',u:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',a:OSM,mz:19},
+ {id:'esri-topo',g:'⛰️',n:'Esri 地形',u:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',a:ESRI,mz:19},
+ {id:'esri-natgeo',g:'🧭',n:'Esri 国家地理',u:'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',a:ESRI+', National Geographic',mz:16},
+ {id:'otm',g:'⛰️',n:'OpenTopoMap 等高线',u:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',s:'abc',a:OSM+', SRTM | &copy; <a href="https://opentopomap.org" target="_blank" rel="noopener">OpenTopoMap</a> (CC-BY-SA)',mz:17},
+ {id:'esri-img',g:'🛰️',n:'Esri 卫星',u:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',a:'Imagery &copy; Esri, Maxar, Earthstar Geographics',mz:19},
+ {id:'dare',g:'🏛️',n:'DARE 罗马帝国古地图',u:'https://dh.gu.se/tiles/imperium/{z}/{x}/{y}.png',a:'&copy; <a href="https://dh.gu.se/dare/" target="_blank" rel="noopener">DARE</a> Johan Åhlfeldt, University of Gothenburg (CC BY)',mz:11},
+ {id:'cyclosm',g:'⛰️',n:'CyclOSM 地形道路',u:'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',s:'abc',a:OSM+' | CyclOSM / OSM France',mz:19},
+ {id:'esri-phys',g:'🌄',n:'Esri 自然地貌',u:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}',a:ESRI+', US National Park Service',mz:8},
+ {id:'esri-shade',g:'🌄',n:'Esri 山体晕渲',u:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}',a:ESRI,mz:13},
+ {id:'osm-fr',g:'🛣️',n:'OSM 法国镜像',u:'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',s:'abc',a:OSM+' | OSM France',mz:19},
+ {id:'osm-de',g:'🛣️',n:'OSM 德国镜像',u:'https://tile.openstreetmap.de/{z}/{x}/{y}.png',a:OSM+' (openstreetmap.de)',mz:19},
+ {id:'osm-hot',g:'🛣️',n:'OSM 人道主义',u:'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',s:'abc',a:OSM+' | HOT / OSM France',mz:19},
+ {id:'opnv',g:'🚌',n:'ÖPNV 交通',u:'https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png',a:OSM+' | memomaps.de (CC-BY-SA)',mz:18},
+ {id:'esri-gray',g:'🌫️',n:'Esri 浅灰',u:'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',a:ESRI,mz:16},
+ {id:'esri-dark',g:'🌙',n:'Esri 夜色',u:'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',a:ESRI,mz:16},
+ {id:'gaode',g:'🇨🇳',n:'高德（大陆网络备用·境外仅轮廓）',u:'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',s:'1234',a:'&copy; 高德地图 AutoNavi',mz:9}
 ];
+/* 底图健康探测：每个来源并行请求 1 张巴勒斯坦 z6 瓦片（≈20KB），6 秒超时；结果在本次会话缓存 30 分钟，供所有地图共用 */
+var probeP=null;
+function probe(){
+  if(probeP)return probeP;
+  probeP=new Promise(function(res){
+    try{var c=JSON.parse(sessionStorage.getItem('fg-tiles')||'null');if(c&&Date.now()-c.t<18e5)return res(c.h)}catch(e){}
+    var h={},left=PROV.length;
+    PROV.forEach(function(p){
+      var u=p.u.replace('{s}',p.s?p.s.charAt(0):'').replace('{z}','6').replace('{x}','38').replace('{y}','26'),im=new Image(),t0=performance.now(),done=false;
+      function fin(ok){if(done)return;done=true;h[p.id]=ok?Math.round(performance.now()-t0):-1;if(--left===0){try{sessionStorage.setItem('fg-tiles',JSON.stringify({t:Date.now(),h:h}))}catch(e){}res(h)}}
+      im.onload=function(){fin(im.naturalWidth>=200)};im.onerror=function(){fin(false)};setTimeout(function(){fin(false)},6000);im.decoding='async';im.referrerPolicy='strict-origin-when-cross-origin';im.src=u;
+    });
+  });
+  return probeP;
+}
 var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,touch=matchMedia('(pointer:coarse)').matches;
 var lfP=null;
 function loadLeaflet(){
@@ -54,7 +76,16 @@ function init(box){
     /* 底图：按钮 + 自动回退 */
     var order=PROV.slice(),first=order.findIndex(function(p){return p.id===cfg.base});if(first>0)order.unshift(order.splice(first,1)[0]);
     var bad={},cur=null,curP=null,timer=null,btns={};
-    order.forEach(function(p){var b=document.createElement('button');b.type='button';b.textContent=p.n;b.title='切换底图：'+p.n;b.addEventListener('click',function(){bad[p.id]=0;use(p,true)});bar.appendChild(b);btns[p.id]=b});
+    order.forEach(function(p){var b=document.createElement('button');b.type='button';b.innerHTML='<i class="hd"></i>';b.appendChild(document.createTextNode(p.g+' '+p.n));b.title='切换底图：'+p.n;b.addEventListener('click',function(){bad[p.id]=0;use(p,true)});bar.appendChild(b);btns[p.id]=b});
+    var probed=false;
+    function applyHealth(h){
+      var okN=0;order.forEach(function(p){var v=h[p.id],b=btns[p.id];b.classList.toggle('h-ok',v>=0);b.classList.toggle('h-bad',v<0);b.title=p.n+(v>=0?'（实测可用 · '+v+' ms）':'（当前网络连不上）');if(v>=0)okN++});
+      /* 把实测可用的来源排在前面（保持推荐顺序），连不上的排到最后 */
+      order.sort(function(a,b){return (h[a.id]<0)-(h[b.id]<0)});
+      order.forEach(function(p){bar.appendChild(btns[p.id])});
+      box._health=okN+'/'+order.length;
+      return okN;
+    }
     function next(reason){
       if(curP){bad[curP.id]=1;btns[curP.id].classList.add('bad')}
       var nx=order.find(function(p){return !bad[p.id]});
@@ -67,13 +98,19 @@ function init(box){
       curP=p;var ok=0,err=0;
       var o={maxZoom:19,maxNativeZoom:p.mz,attribution:p.a,detectRetina:false,updateWhenIdle:touch,keepBuffer:2,crossOrigin:false};if(p.s)o.subdomains=p.s;
       cur=L.tileLayer(p.u,o);
-      cur.on('tileload',function(){ok++;if(ok===1){clearTimeout(timer);if(!auto||manual)status(box,'✅ 底图：'+p.n+'（可在上方切换 11 种来源）');else setTimeout(function(){status(box,'✅ 已改用：'+p.n)},1800)}});
+      cur.on('tileload',function(){ok++;if(ok===1){clearTimeout(timer);if(!auto||manual)status(box,'✅ 底图：'+p.n+'（可在上方切换 '+PROV.length+' 种来源）');else setTimeout(function(){status(box,'✅ 已改用：'+p.n)},1800)}});
       cur.on('tileerror',function(){err++;if(ok===0&&err>=4&&curP===p)next('连接失败')});
       cur.addTo(map);cur.bringToBack();
       timer=setTimeout(function(){if(ok===0&&curP===p)next('8 秒无响应')},8000);
       if(!auto)status(box,'⏳ 正在载入底图：'+p.n+'…');
     }
+    /* 先用推荐源立即开始；探测完成后若当前源不可用则切到最快的可用源 */
     use(order[0]);
+    probe().then(function(h){var n=applyHealth(h);probed=true;
+      if(h[curP.id]<0){var nx=order.find(function(p){return h[p.id]>=0&&!bad[p.id]});if(nx){bad[curP.id]=1;btns[curP.id].classList.add('bad');status(box,'⚠️ '+curP.n+' 在你的网络下连不上，已自动改用 '+nx.n,'warn');use(nx,false,true)}}
+      else if(!n){status(box,'⚠️ 17 个在线底图在当前网络都连不上。离线讲解图照常可用；路线与地点仍叠加在此。','err')}
+      var hs=box.querySelector('.mm-health');if(hs)hs.textContent='📡 底图实测：'+n+'/'+order.length+' 可用';
+    });
     /* 工具条 */
     box.querySelectorAll('.mm-btn').forEach(function(b){b.addEventListener('click',function(){
       var a=b.dataset.a;
@@ -112,7 +149,7 @@ function pop(n,i){var d=document.createElement('div');var b=document.createEleme
 var boxes=[].slice.call(document.querySelectorAll('.mm-live'));
 if(!boxes.length)return;
 if('IntersectionObserver' in window){
-  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){io.unobserve(e.target);var t=e.target;(window.requestIdleCallback||function(f){return setTimeout(f,200)})(function(){init(t)},{timeout:1500})}})},{rootMargin:'400px 0px'});
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){io.unobserve(e.target);var t=e.target;probe();(window.requestIdleCallback||function(f){return setTimeout(f,200)})(function(){init(t)},{timeout:1500})}})},{rootMargin:'400px 0px'});
   boxes.forEach(function(b){io.observe(b)});
 }else boxes.forEach(init);
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){var f=document.querySelector('.mm-live.full');if(f){var b=f.querySelector('[data-a=full]');if(b)b.click()}}});

@@ -1,4 +1,4 @@
-/* 四福音书深读 GROKstudy v2.0.0 · 2026-11-14 — 无布局抖动的滚动、IntersectionObserver 目录高亮、标记开关、顺滑滚动、讲解图交互、信经朗读 */
+/* 四福音书深读 GROKstudy v2.1.0 · 2026-11-14 — 屏幕外/滚动中暂停装饰动画、CSS 滚动进度条、 无布局抖动的滚动、IntersectionObserver 目录高亮、标记开关、顺滑滚动、讲解图交互、信经朗读 */
 (function(){
 "use strict";
 var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
@@ -15,8 +15,30 @@ function tocToggle(force){
 on($('#tocbtn'),'click',function(){tocToggle()});
 on($('#tocx'),'click',function(){tocToggle(false)});
 on($('#scrim'),'click',function(){html.classList.remove('toc-open')});
-$$('#toc a').forEach(function(a){on(a,'click',function(e){if(!wide())html.classList.remove('toc-open');if(lenis){e.preventDefault();var t=document.getElementById(a.getAttribute('href').slice(1));if(t){lenis.scrollTo(t,{offset:-70});history.replaceState(null,'',a.getAttribute('href'))}}})});
-on($('#tocq'),'input',function(){var q=this.value.trim().toLowerCase();$$('#toc li').forEach(function(li){li.classList.toggle('hid',!!q&&li.textContent.toLowerCase().indexOf(q)<0)})});
+/* 目录跳转：屏幕外区块按估计高度占位，跳转后再校正一次落点 */
+function fixLand(t){[260,700].forEach(function(ms){setTimeout(function(){var d=t.getBoundingClientRect().top-70;if(Math.abs(d)>8){if(lenis)lenis.scrollTo(t,{offset:-70,immediate:true});else scrollBy({top:d,behavior:'instant'})}},ms)})}
+$$('#toc a').forEach(function(a){on(a,'click',function(e){if(!wide())html.classList.remove('toc-open');var li0=a.closest('li');if(li0&&li0.classList.contains('has')&&li0.classList.contains('shut'))tocSet(li0,true);var t=document.getElementById(a.getAttribute('href').slice(1));if(!t)return;
+  if(lenis){e.preventDefault();lenis.scrollTo(t,{offset:-70,onComplete:function(){fixLand(t)}});history.replaceState(null,'',a.getAttribute('href'))}
+  else{e.preventDefault();t.scrollIntoView({behavior:'instant',block:'start'});history.replaceState(null,'',a.getAttribute('href'));fixLand(t)}})});
+/* 三级目录：折叠 / 展开 */
+function tocSet(li,open){li.classList.toggle('shut',!open);var b=li.querySelector(':scope>.tcr>.tg');if(b)b.setAttribute('aria-expanded',open)}
+$$('#toc .tg').forEach(function(b){on(b,'click',function(e){e.preventDefault();var li=b.closest('li');tocSet(li,li.classList.contains('shut'))})});
+$$('#toc [data-tx]').forEach(function(b){on(b,'click',function(){var m=b.dataset.tx;$$('#toc li.has').forEach(function(li){var l1=li.classList.contains('l1'),l2=li.classList.contains('l2');tocSet(li,m==='all'||(m==='l2'&&l1))})})});
+function tocReveal(a){for(var li=a.closest('li');li;li=li.parentElement&&li.parentElement.closest('#toc li')){if(li.classList.contains('has')&&li.classList.contains('shut')&&li.querySelector(':scope>ol').contains(a))tocSet(li,true)}}
+on($('#tocq'),'input',function(){var q=this.value.trim().toLowerCase();$$('#toc li').forEach(function(li){var hit=!q||li.textContent.toLowerCase().indexOf(q)>=0;li.classList.toggle('hid',!hit);if(q&&hit&&li.classList.contains('has'))tocSet(li,true)})});
+/* 拖动目录边缘调整宽度（鼠标 / 触控笔 / 平板触摸；键盘 ←→；双击复原），宽度存 localStorage */
+var rs=$('#tocrs'),TW0=290;
+function tocMax(){return wide()?Math.min(720,Math.round(innerWidth*0.6)):Math.round(innerWidth*0.92)}
+function setTW(w,save){w=Math.max(220,Math.min(tocMax(),Math.round(w)));html.style.setProperty('--tocw',w+'px');if(save)store('fg-tocw',String(w));return w}
+if(rs){
+  var dragW=0,dragRaf=0,pid=null;
+  on(rs,'pointerdown',function(e){if(e.button>0)return;e.preventDefault();pid=e.pointerId;try{rs.setPointerCapture(pid)}catch(x){}html.classList.add('tocdrag')});
+  on(rs,'pointermove',function(e){if(pid===null||e.pointerId!==pid)return;dragW=e.clientX;if(!dragRaf)dragRaf=requestAnimationFrame(function(){dragRaf=0;setTW(dragW)})});
+  function endDrag(e){if(pid===null)return;pid=null;html.classList.remove('tocdrag');setTW(parseFloat(getComputedStyle(html).getPropertyValue('--tocw'))||TW0,true);window.dispatchEvent(new Event('resize'))}
+  on(rs,'pointerup',endDrag);on(rs,'pointercancel',endDrag);on(rs,'lostpointercapture',endDrag);
+  on(rs,'dblclick',function(){html.style.removeProperty('--tocw');store('fg-tocw','');window.dispatchEvent(new Event('resize'))});
+  on(rs,'keydown',function(e){var cur=parseFloat(getComputedStyle(html).getPropertyValue('--tocw'))||TW0;if(e.key==='ArrowLeft'){e.preventDefault();setTW(cur-24,true)}if(e.key==='ArrowRight'){e.preventDefault();setTW(cur+24,true)}});
+}
 /* ---------- nav / theme / marks ---------- */
 on($('#navbtn'),'click',function(e){e.stopPropagation();$('#navdrop').classList.toggle('open')});
 document.addEventListener('click',function(e){var nd=$('#navdrop');if(nd&&!e.target.closest('#navdrop'))nd.classList.remove('open')});
@@ -46,12 +68,26 @@ function setSmooth(v){
 on(sb,'click',function(){setSmooth(store('fg-smooth')==='0')});
 if(smoothOK)(window.requestIdleCallback||setTimeout)(function(){setSmooth(store('fg-smooth')!=='0')});else setSmooth(false);
 /* ---------- 滚动：只读 scrollY，写 transform；无强制同步布局 ---------- */
-var prog=$('#prog'),top=$('#totop'),ticking=false,maxS=1,shown=false;
-function measure(){maxS=Math.max(1,html.scrollHeight-innerHeight)}
-function frame(){var y=window.scrollY;prog.style.transform='scaleX('+Math.min(1,y/maxS).toFixed(4)+')';var sh=y>600;if(sh!==shown){shown=sh;top.classList.toggle('show',sh)}ticking=false}
-function queue(){if(!ticking){ticking=true;requestAnimationFrame(frame)}}
-addEventListener('scroll',queue,{passive:true});addEventListener('resize',function(){measure();queue()},{passive:true});addEventListener('load',function(){measure();queue()});
-if('ResizeObserver' in window)new ResizeObserver(function(){measure()}).observe(document.body);measure();frame();
+var prog=$('#prog'),top=$('#totop'),ticking=false,maxS=1,shown=false,bodyH=0,vh=innerHeight;
+/* 进度条：支持 CSS scroll-timeline 的浏览器完全交给合成线程，JS 不再写样式 */
+var cssProg=!!(window.CSS&&CSS.supports&&CSS.supports('animation-timeline','scroll()'));if(cssProg)html.classList.add('sprog');
+function measure(){maxS=Math.max(1,(bodyH||html.scrollHeight)-vh)}
+function frame(){var y=window.scrollY;if(!cssProg)prog.style.transform='scaleX('+Math.min(1,y/maxS).toFixed(4)+')';var sh=y>600;if(sh!==shown){shown=sh;top.classList.toggle('show',sh)}ticking=false}
+/* 滚动进行中：给 html 加 .scrolling，暂停“行进虚线”等需要重绘的装饰动画，滚动停下 160ms 后恢复 */
+var sT=0,sOn=false;function scrolling(){if(!sOn){sOn=true;html.classList.add('scrolling')}clearTimeout(sT);sT=setTimeout(function(){sOn=false;html.classList.remove('scrolling')},160)}
+function queue(){scrolling();if(!ticking){ticking=true;requestAnimationFrame(frame)}}
+addEventListener('scroll',queue,{passive:true});addEventListener('resize',function(){vh=innerHeight;measure();if(!ticking){ticking=true;requestAnimationFrame(frame)}},{passive:true});
+/* 文档高度由 ResizeObserver 提供（不在脚本执行时强制同步布局） */
+if('ResizeObserver' in window)new ResizeObserver(function(es){var r=es[0];bodyH=(r.borderBoxSize&&r.borderBoxSize[0]?r.borderBoxSize[0].blockSize:r.contentRect.height)+ (parseFloat(getComputedStyle(document.body).marginTop)||0);measure()}).observe(document.body);
+else addEventListener('load',function(){measure();frame()});
+requestAnimationFrame(function(){requestAnimationFrame(frame)});
+/* 装饰动画只在屏幕内播放（地图行进线、船、波浪、轨道图、热区） */
+if('IntersectionObserver' in window){
+  var anim=$$('.mapmod,.mm,.orbitf,.twoage,.svgwrap,.pchart,.jbox,.mapbox,.hero,.gwrap,.fwheel,.quick');
+  anim.forEach(function(el){el.classList.add('ap')});
+  var aio=new IntersectionObserver(function(es){es.forEach(function(e){e.target.classList.toggle('ap',!e.isIntersecting)})},{rootMargin:'80px 0px'});
+  anim.forEach(function(el){aio.observe(el)});
+}
 on(top,'click',function(){if(lenis)lenis.scrollTo(0);else scrollTo({top:0,behavior:reduce?'auto':'smooth'})});
 /* scrollspy via IntersectionObserver */
 var links=$$('#toc a'),map={},act=null;
@@ -61,7 +97,7 @@ if('IntersectionObserver' in window&&links.length){
   var spy=new IntersectionObserver(function(es){
     es.forEach(function(e){vis[e.target.id]=e.isIntersecting?e.boundingClientRect.top:undefined});
     var best=null,bt=1e9;for(var k in vis){if(vis[k]!==undefined&&vis[k]<bt){bt=vis[k];best=k}}
-    if(best&&map[best]&&map[best]!==act){if(act)act.classList.remove('act');act=map[best];act.classList.add('act');
+    if(best&&map[best]&&map[best]!==act){if(act)act.classList.remove('act');act=map[best];act.classList.add('act');tocReveal(act);
       if(wide()&&!html.classList.contains('toc-off')){var tr=toc.getBoundingClientRect(),ar=act.getBoundingClientRect();if(ar.top<tr.top+60||ar.bottom>tr.bottom-20)toc.scrollTo({top:toc.scrollTop+ar.top-tr.top-tr.height/3,behavior:'smooth'})}}
   },{rootMargin:'-64px 0px -55% 0px'});
   Object.keys(map).forEach(function(id){var h=document.getElementById(id);if(h)spy.observe(h)});
@@ -108,6 +144,8 @@ $$('.mapmod').forEach(function(m){
   if(vb&&tp)on(vb,'click',function(){tp.classList.toggle('torn');vb.classList.toggle('on',tp.classList.contains('torn'))});
   if(svg&&reduce&&svg.pauseAnimations)svg.pauseAnimations();
 });
+$$('.fw-wrap').forEach(function(w){var info=w.nextElementSibling;$$('.hot',w).forEach(function(h){function sel(){$$('.hot.sel',w).forEach(function(x){x.classList.remove('sel')});h.classList.add('sel');if(!info)return;info.textContent='';var b=document.createElement('b');b.textContent='🕎 '+h.dataset.n+'：';info.appendChild(b);info.appendChild(document.createTextNode(h.dataset.i||''))}
+  on(h,'click',sel);on(h,'keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();sel()}})})});
 /* ---------- 信经背诵模式 + 朗读 ---------- */
 var synth=window.speechSynthesis,speaking=null;
 $$('.recite').forEach(function(r){
